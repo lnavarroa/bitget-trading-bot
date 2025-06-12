@@ -1,0 +1,80 @@
+1. Gestión de múltiples bots en paralelo (mejorar control y visualización)
+
+Ya se permite lanzar varios bots, pero puedes mejorar:
+
+Mostrar estado individual de cada bot (activo, esperando compra, en venta, etc.)
+
+Mostrar historial básico por bot (última compra, última venta, ganancias acumuladas)
+
+    Agregar botón "Ver Detalles" por bot
+
+    ¿Ventaja? Esto te da trazabilidad clara sin revisar consola.
+
+
+
+✅ 2. Persistencia: guardar bots y ganancias aunque se reinicie el backend
+
+Ahora los bots están solo en memoria (RAM), lo cual se borra si reinicias el servidor. Puedes:
+
+Guardar estado y configuración en un archivo JSON
+
+    O usar una base de datos sencilla como SQLite o MongoDB (Atlas)
+
+    ¿Ventaja? Puedes recuperar bots activos tras un reinicio o actualizar el dashboard sin perder progreso.
+
+
+✅ 3. Filtro inteligente de pares para seleccionar
+
+Ahora escribes manualmente CHEEMSUSDT_SPBL, pero podrías:
+
+Obtener la lista de todos los pares spot desde la API pública (/api/spot/v1/public/products) --✅listo--
+
+Filtrarlos por volumen, liquidez o nombre
+
+    Agregar un dropdown en el frontend para elegir un par
+
+    ¿Ventaja? Menos errores y más opciones para operar.
+
+
+
+✅ 4. Logging por bot (log histórico por archivo)
+
+Grabar logs por cada bot en archivos individuales como:
+
+/logs/bot-123456789.json
+
+Con estructura:
+[
+  { "tipo": "compra", "precio": 0.0021, "monto": 10, "hora": "2025-06-11T12:00:00Z" },
+  { "tipo": "venta", "precio": 0.0022, "monto": 10.6, "hora": "2025-06-11T12:03:00Z" }
+]
+
+¿Ventaja? Puedes revisar operaciones pasadas o calcular tu ROI a lo largo del tiempo
+
+
+
+✅ 5. Opción para detener el bot luego de cierta ganancia acumulada o ciclos completados
+
+Campo: "Detener bot después de X ciclos" o "Después de alcanzar X USDT"
+
+    Esto te permite hacer pruebas automáticas sin intervención manual
+
+    
+
+🔜 6. Separar por estrategia (como mencionaste antes)
+
+Actualmente solo usamos scalping, pero podrías:
+
+    Preparar estructura base para:
+
+        Scalping
+
+        Breakouts
+
+        DCA
+
+        Trailing Entry
+
+    Cada estrategia en su propio archivo strategies/scalping.js, etc.
+
+    Y elegir la estrategia desde el dashboard

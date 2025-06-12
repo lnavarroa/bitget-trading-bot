@@ -1,0 +1,50 @@
+					-- ESTRATEGIAS DE TRADING --
+1. 🧲 Trailing Entry (Entrada con seguimiento)
+
+Es una forma de "perseguir" el mejor precio y esperar un rebote.
+
+📌 Ejemplo:
+
+    El precio baja de 1.00 → 0.98 → 0.96...
+
+    El bot no compra aún, pero recuerda que el mínimo fue 0.96
+
+    Cuando el precio sube a 0.965 (ej. +0.5% del mínimo), entonces compra
+
+✅ Evita comprar en caída libre
+✅ Se adapta automáticamente
+🔴 Puede perder oportunidades si el rebote es débil
+
+
+2. ⚡ Scalping
+
+Estrategia ultra rápida: busca pequeñas ganancias en muy poco tiempo (segundos o minutos).
+
+📌 El bot:
+
+    Compra a 0.002430
+
+    Vende a 0.002440 (ganancia de 0.4%)
+
+    Lo repite muchas veces al día
+
+✅ Funciona bien con pares muy líquidos
+✅ Ideal con WebSocket para entrar/salir rápido
+🔴 Requiere buena ejecución, bajas comisiones y velocidad
+
+
+3. 📈 Breakout Trading (Rupturas de rango)
+
+El bot espera que el precio rompa una resistencia o rompa un soporte, lo que puede iniciar una gran tendencia.
+
+📌 Ejemplo:
+
+    El precio estuvo entre 0.00100 y 0.00105 por horas (rango lateral)
+
+    Si rompe 0.00105 con volumen alto → compra esperando subida
+
+    Si rompe 0.00100 hacia abajo → vende o se detiene
+
+✅ Alta probabilidad de movimientos grandes
+✅ Evita operar durante consolidaciones
+🔴 Puede haber falsas rupturas (falsos breakouts)

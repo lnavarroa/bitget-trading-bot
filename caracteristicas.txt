@@ -1,0 +1,19 @@
+Checklist de lo que ya tienes (completo)
+
+Trade automático en Bitget usando órdenes limit.
+
+Monto inicial configurable.
+
+Cálculo automático de ganancia y reinversión del monto.
+
+Porcentaje de entrada y ganancia configurables.
+
+Monitoreo en tiempo real del estado del bot.
+
+Monto acumulado mostrado en el dashboard.
+
+Ciclo completo de ejecución con lógica robusta (espera, cancelación si no se ejecuta, etc.).
+
+/bots-activos: lista de bots con id, symbol y montoActual individual.
+
+/monto-actual-total: monto total acumulado de todos los bots.

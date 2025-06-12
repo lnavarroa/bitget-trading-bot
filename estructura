@@ -1,0 +1,14 @@
+bitget-trding-bot
+├── backend/
+	├── config/
+	├── services/
+	├── utils/          ← 📁 Aquí va logger.js
+	│   └── logger.js
+	├── logs/           ← 📁 Aquí se guardarán logs por bot
+	├── index.js
+	└── ...otros archivos
+├── frontend/
+	├── public/
+	├── src/
+		└── App.jsx
+	└── ...otros archivos
