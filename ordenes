@@ -1,0 +1,10 @@
+quest: undefined
+🟢 Iniciando ejecutarScalping para RIFSOLUSDT
+📩 Mensaje recibido: {"event":"subscribe","arg":{"instType":"SPOT","channel":"ticker","instId":"RIFSOLUSDT"}}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"ticker","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","lastPr":"0.002508","open24h":"0.002539","high24h":"0.002603","low24h":"0.002445","change24h":"0.01580","bidPr":"0.002506","askPr":"0.002518","bidSz":"64369.22","askSz":"55008.01","baseVolume":"2246956394.17","quoteVolume":"5647434.14","openUtc":"0.002467","changeUtc24h":"0.01662","ts":"1749949985531"}],"ts":1749949985532}
+📈 Precio actual: 0.002508
+➡️ Intentando comprar 799.046258 RIFSOLUSDT a 0.002503 USDT
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"ticker","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","lastPr":"0.002516","open24h":"0.002539","high24h":"0.002603","low24h":"0.002445","change24h":"0.01904","bidPr":"0.002506","askPr":"0.002518","bidSz":"64369.22","askSz":"5008.01","baseVolume":"2246956394.17","quoteVolume":"5647434.14","openUtc":"0.002467","changeUtc24h":"0.01662","ts":"1749949985869"}],"ts":1749949985876}
+📤 Orden enviada: {"code":"00000","msg":"success","requestTime":1749949985962,"data":{"orderId":"1317951253939404801","clientOid":"orden-compra-1749949985709"}}
+🟢 Orden de compra enviada: 1317951253939404801
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"ticker","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","lastPr":"0.002516","open24h":"0.002539","high24h":"0.002603","low24h":"0.002445","change24h":"0.01904","bidPr":"0.002506","askPr":"0.002518","bidSz":"64369.22","askSz":"55008.0

@@ -1,0 +1,11 @@
+Qué observar durante la prueba:
+
+    ✅ Que se envíe una orden de compra.
+
+    ✅ Que la orden se ejecute (puede tardar si el precio está más abajo).
+
+    ✅ Que luego se envíe la orden de venta.
+
+    ✅ Que se vea la ganancia y se actualice el monto.
+
+    ✅ Que se registre en /logs/bot-{ID}.json.

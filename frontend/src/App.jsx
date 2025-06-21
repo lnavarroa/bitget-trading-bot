@@ -3,10 +3,10 @@ import './App.css';
 
 function App() {
   const [view, setView] = useState('nuevo');
-  const [symbol, setSymbol] = useState('CHEEMSUSDT_SPBL');
-  const [amount, setAmount] = useState(10);
-  const [profitMargin, setProfitMargin] = useState(0.006);
-  const [entryDiscount, setEntryDiscount] = useState(0.003);
+  const [symbol, setSymbol] = useState('RIFSOLUSDT');
+  const [amount, setAmount] = useState(2);
+  const [profitMargin, setProfitMargin] = useState(0.004);
+  const [entryDiscount, setEntryDiscount] = useState(0.002);
   const [response, setResponse] = useState(null);
   const [botActivo, setBotActivo] = useState(false);
   const [montoActual, setMontoActual] = useState(null);
@@ -17,9 +17,13 @@ function App() {
   const [pairs, setPairs] = useState([]);
   const filteredPairs = pairs.filter(p => p.symbol.includes(searchTerm));
 
+  const API_TOKEN = 'mi-token-seguro'; // Token de autenticación
+
   const fetchBalance = async () => {
     try {
-      const res = await fetch('http://localhost:3001/balance');
+      const res = await fetch('http://localhost:3001/balance', {
+        headers: { Authorization: API_TOKEN }
+      });
       const data = await res.json();
       setSaldoUSDT(data.balance);
     } catch (err) {
@@ -28,51 +32,94 @@ function App() {
   };
 
   const handleStartBot = async () => {
-    const res = await fetch('http://localhost:3001/start-bot', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        symbol,
-        amount,
-        profitMargin,
-        entryDiscountPercentage: entryDiscount
-      })
-    });
-    const data = await res.json();
-    setResponse(data.message || 'Bot ejecutado');
-    setBotActivo(true);
-    fetchBotsActivos();
+    if (!symbol || !amount || !profitMargin || !entryDiscount) {
+      setResponse('Por favor, completa todos los campos antes de iniciar el bot.');
+      return;
+    }
+  
+    if (amount <= 0 || profitMargin <= 0 || entryDiscount <= 0) {
+      setResponse('Los valores deben ser positivos.');
+      return;
+    }
+  
+    try {
+      const res = await fetch('http://localhost:3001/start-bot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: API_TOKEN
+        },
+        body: JSON.stringify({
+          symbol,
+          amount,
+          profitMargin,
+          entryDiscountPercentage: entryDiscount
+        })
+      });
+      const data = await res.json();
+      setResponse(data.message || 'Bot ejecutado');
+      if (data.id) {
+        setResponse(`Bot iniciado con ID: ${data.id}`);
+      }
+      setBotActivo(true);
+      fetchBotsActivos();
+    } catch (err) {
+      console.error('Error al iniciar el bot:', err);
+      setResponse('Error al iniciar el bot.');
+    }
   };
 
   const handleStopBot = async (id) => {
     const confirm = window.confirm('¿Estás seguro de que deseas detener este bot?');
     if (!confirm) return;
 
-    const res = await fetch('http://localhost:3001/stop-bot', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id })
-    });
-    const data = await res.json();
-    setResponse(data.message || 'Bot detenido');
-    fetchBotsActivos();
+    try {
+      const res = await fetch('http://localhost:3001/stop-bot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: API_TOKEN
+        },
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      setResponse(data.message || 'Bot detenido');
+      fetchBotsActivos();
+    } catch (err) {
+      console.error('Error al detener el bot:', err);
+      setResponse('Error al detener el bot.');
+    }
   };
 
   const fetchBotsActivos = async () => {
-    const res = await fetch('http://localhost:3001/bots-activos');
-    const data = await res.json();
-    setBotsActivos(data.bots);
+    try {
+      const res = await fetch('http://localhost:3001/bots-activos', {
+        headers: { Authorization: API_TOKEN }
+      });
+      const data = await res.json();
+      setBotsActivos(data.bots);
+    } catch (err) {
+      console.error('Error al obtener bots activos:', err);
+    }
   };
 
   const fetchMontoTotal = async () => {
-    const res = await fetch('http://localhost:3001/monto-actual-total');
-    const data = await res.json();
-    setMontoTotal(data.montoActualTotal);
+    try {
+      const res = await fetch('http://localhost:3001/monto-actual-total', {
+        headers: { Authorization: API_TOKEN }
+      });
+      const data = await res.json();
+      setMontoTotal(data.montoActualTotal);
+    } catch (err) {
+      console.error('Error al obtener monto total:', err);
+    }
   };
 
   const fetchPairs = async () => {
     try {
-      const res = await fetch('http://localhost:3001/pairs');
+      const res = await fetch('http://localhost:3001/pairs', {
+        headers: { Authorization: API_TOKEN }
+      });
       const json = await res.json();
 
       if (Array.isArray(json.pairs)) {
@@ -113,7 +160,6 @@ function App() {
         <h1>Panel de Control - Bitget Bot</h1>
         <p><strong>Saldo disponible (USDT):</strong> {Number(saldoUSDT || 0).toFixed(8)} USDT</p>
 
-
         {view === 'nuevo' && (
           <>
             <div>
@@ -140,12 +186,12 @@ function App() {
             </div>
 
             <div>
-              <label>% de Ganancia (ej: 0.006 = 0.6%):</label>
+              <label>% de Ganancia (ej: 0.004 = 0.4%):</label>
               <input type="number" step="0.0001" value={profitMargin} onChange={e => setProfitMargin(parseFloat(e.target.value))} />
             </div>
 
             <div>
-              <label>% de Descuento de Entrada (ej: 0.003 = 0.3%):</label>
+              <label>% de Descuento de Entrada (ej: 0.002 = 0.2%):</label>
               <input type="number" step="0.0001" value={entryDiscount} onChange={e => setEntryDiscount(parseFloat(e.target.value))} />
             </div>
 
