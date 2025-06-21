@@ -4,16 +4,17 @@
 .env.local
 
 # Backend
-/backend/node_modules
+/backend/node_modules/
 /backend/package-lock.json
 
 # Frontend
-/frontend/node_modules
+/frontend/node_modules/
 /frontend/dist
 /frontend/.vite
 
 #otros
-node_modules
+bitget-api-master/
+node_modules/
 build
 dist
 github-token.txt
