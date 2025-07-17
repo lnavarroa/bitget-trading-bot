@@ -11,275 +11,225 @@ const { logOperacion } = require('../utils/logger');
 
 let botActivo = false;
 let currentAmount = null;
+let ordenActual = null;
+let faseActual = null;
+let symbolMonitoreado = null;
+let configInicial = null;
+let ciclesCount = null;
+
 const ordenesPendientes = new Map();
+const botsActivos = new Map();
 
 const wsClient = new WsClient('wss://ws.bitget.com/v2/ws/private', {
   receive: (data) => {
     console.log('📩 Mensaje recibido:', data);
   }
 });
-/*
-// Suscribirse al canal `orders` para manejar eventos de órdenes llenadas
-wsClient.on('open', () => {
-  console.log('✅ WebSocket conectado');
-  const subscribeReq = {
-    op: 'subscribe',
-    args: [
-      {
-        instType: 'SPOT',
-        channel: 'orders',
-        instId: 'default' // Cambiar dinámicamente según el símbolo
-      }
-    ]
-  };
-  console.log('✅ WebSocket conectado');
-  wsClient.subscribeReq([
-    { instType: 'SPOT', channel: 'orders', instId: 'default' },
-    { instType: 'SPOT', channel: 'ticker', instId: 'default' }
-  ]);
-  wsClient.send(subscribeReq);
-  console.log(`sendInfo:${JSON.stringify(subscribeReq)}`);
-});
-*/
-wsClient.on('message', (data) => {
-  try {
-    const msg = JSON.parse(data);
-    if (msg.event === 'error') {
-      console.error(`❌ Error recibido del WebSocket: ${msg.code} - ${msg.msg}`);
-      return;
-    }
 
-    if (msg.action === 'update' && msg.arg.channel === 'orders') {
-      const order = msg.data[0];
-      const orderId = order.orderId;
-      if (ordenesPendientes.has(orderId) && order.status === 'filled') {
-        ordenesPendientes.get(orderId)();
-        ordenesPendientes.delete(orderId);
-        console.log(`✅ Orden ${orderId} ejecutada`);
-      }
-    }
-  } catch (error) {
-    console.error('❌ Error al procesar el mensaje:', error);
+wsClient.on('login_success', () => {
+  if (symbolMonitoreado) {
+    wsClient.subscribe([
+      new SubscribeReq('SPOT', 'orders', symbolMonitoreado)
+    ]);
+  } else {
+    console.warn('⚠️ No se pudo suscribir al canal de órdenes: símbolo no definido aún.');
   }
 });
-/*
-async function obtenerPrecio(symbol) {
-  console.log(`✅ Entrando a obtener precio para ${symbol}`);
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject(new Error('⏰ Timeout esperando precio'));
-    }, 15000);
 
-    wsClient.subscribe([
-      new SubscribeReq('SPOT', 'ticker', symbol)
-    ]);
+wsClient.on('orderUpdate', async (order) => {
+  console.log(`✅ --**--Evento Recibido--**--`);
+  console.log('📦 Orden completa recibida:\n', JSON.stringify(order, null, 2));
 
-    wsClient.on('message', (data) => {
-      try {
-        const msg = JSON.parse(data);
-        if (msg.action === 'snapshot' && msg.arg.channel === 'ticker' && msg.data[0]?.lastPr) {
-          const precioActual = parseFloat(msg.data[0].lastPr);
-          console.log(`📈 Precio actual para ${symbol}: ${precioActual}`);
-          clearTimeout(timeout);
-          resolve(parseFloat(msg.data[0].lastPr));
-        }
-      } catch (error) {
-        console.error('❌ Error al procesar el mensaje:', error);
-      }
+  const orderId = order.orderId;
+  const status = order.status;
+  const symbol = order.instId;
+
+  if (!ordenActual || ordenActual.symbol !== symbol) {
+    console.log('⚠️ Orden recibida pero ignorada por símbolo. Esperado:', ordenActual?.symbol, 'Recibido:', symbol);
+    return;
+  }
+
+  if (faseActual === 'comprando' && order.side === 'buy' && status === 'filled') {
+    console.log(`✅ Orden COMPRA completada (${order.side}): ${orderId}`);
+    logOperacion(ordenActual.botId, {
+      tipo: 'compra',
+      precio: ordenActual.entryPrice,
+      monto: currentAmount,
+      symbol
     });
-  });
-}*/
+    
+    const sellPrice = ordenActual.entryPrice * (1 + ordenActual.profitMargin);
+    const cantidadComprada = parseFloat(order.accBaseVolume);
+    const fee = parseFloat(order.feeDetail?.[0]?.fee || '0');
+    const sellQty = (cantidadComprada + fee).toFixed(6);
+
+    console.log(`precio venta: ${sellPrice}, cantidad comprada ${cantidadComprada}, fee: ${fee}, cantidad venta; ${sellQty} `);
+
+//aqui coloca la orden de venta, 
+//luego de confirmar el evento que confirma la orden limit de compra
+    const sellOrder = await placeLimitOrder({
+      symbol,
+      side: 'sell',
+      price: sellPrice.toFixed(6),
+      size: sellQty,
+      clientOid: `orden-venta-${Date.now()}`
+    });
+
+    const sellOrderId = sellOrder?.data?.orderId;
+    if (!sellOrderId) throw new Error('❌ No se recibió orderId de venta');
+
+    faseActual = 'vendiendo';
+    ordenActual.orderId = sellOrderId;
+    ordenActual.sellPrice = sellPrice;
+    console.log(`📤 Orden de venta enviada: ${sellOrderId}`);
+
+  } else if (faseActual === 'vendiendo' && order.side === 'sell' && status === 'filled') {
+      console.log(`✅ Orden VENTA completada (${order.side}): ${orderId}`);
+      logOperacion(ordenActual.botId, {
+        tipo: 'venta',
+        precio: ordenActual.sellPrice,
+        monto: currentAmount,
+        symbol
+      });
+
+      // Calcular datos para log de venta
+      const sellPrice = ordenActual.sellPrice;
+      const cantidadComprada = parseFloat(order.accBaseVolume);
+      const feeDetalle = order.feeDetail || [];
+
+      let feeUSDT = 0;
+      for (const f of feeDetalle) {
+        if (f.feeCoin === 'USDT') {
+          feeUSDT += Math.abs(parseFloat(f.fee));
+        }
+      }
+
+      const montoRecibido = cantidadComprada * sellPrice;
+      const montoNeto = montoRecibido - feeUSDT;
+      currentAmount = montoNeto;
+
+      const sellQty = cantidadComprada.toFixed(6); // para mantener consistencia en el log
+
+      console.log(`precio venta: ${sellPrice}, cantidad comprada: ${cantidadComprada}, fee USDT: ${feeUSDT}, cantidad venta: ${sellQty}`);
+      console.log(`📊 Monto actualizado: ${currentAmount.toFixed(6)} USDT`);
+
+      setTimeout(() => {
+        iniciarCiclo({
+          ...configInicial,
+          amount: currentAmount  // actualizamos con lo ganado
+        });
+      }, 3000);
+    }
+});
 
 async function obtenerPrecio(symbol) {
-  console.log(`✅ Entrando a obtener precio para ${symbol}`);
-  
-  // Crear un nuevo cliente WebSocket público para obtener el precio
-  const wsPublicClient = new WsClient('wss://ws.bitget.com/v2/ws/public', {
-    receive: (data) => {
-      console.log('📩 Mensaje recibido del WebSocket público:', data);
-    }
-  });
-
   return new Promise((resolve, reject) => {
-    wsPublicClient.connect(); // Conectar al WebSocket público
+    const wspublic = new WsClient('wss://ws.bitget.com/v2/ws/public');
 
-    wsPublicClient.on('open', () => {
-      console.log('✅ WebSocket público conectado para obtener precio.');
+    const timeout = setTimeout(() => {
+      wspublic.close();
+      reject(new Error('⏰ Timeout esperando precio'));
+    }, 8000);
 
-      wsPublicClient.subscribe([
+    wspublic.on('open', () => {
+      wspublic.subscribe([
         new SubscribeReq('SPOT', 'ticker', symbol)
       ]);
     });
 
-    wsPublicClient.on('message', (data) => {
+    wspublic.on('message', (data) => {
       try {
         const msg = JSON.parse(data);
-        if (msg.action === 'snapshot' && msg.arg.channel === 'ticker' && msg.data[0]?.lastPr) {
-          const precioActual = parseFloat(msg.data[0].lastPr);
-          console.log(`📈 Precio actual para ${symbol}: ${precioActual}`);
-          if (wsPublicClient.socket?.readyState === WebSocket.OPEN) {
-            wsPublicClient.close();
-            console.log('✅ WebSocket público cerrado después de obtener el precio.');
-          }
-          resolve(precioActual);
+        if (
+          ['snapshot', 'update'].includes(msg.action) &&
+          msg.arg?.channel === 'ticker' &&
+          msg.data?.[0]?.lastPr
+        ) {
+          clearTimeout(timeout); // 💡 Detener timeout al recibir el precio
+          const precio = parseFloat(msg.data[0].lastPr);
+          wspublic.close(); // 💡 Cerrar solo si no se cerró aún
+          resolve(precio);
         }
-      } catch (error) {
-        console.error('❌ Error al procesar el mensaje:', error);
+      } catch (err) {
+        clearTimeout(timeout);
+        reject(err);
       }
     });
 
-    const timeout = setTimeout(() => {
-      console.error('❗ Timeout esperando precio.');
-      if (wsPublicClient.socket?.readyState === WebSocket.OPEN) {
-        wsPublicClient.close();
-        console.log('✅ WebSocket público cerrado después de timeout.');
-      }
-      reject(new Error('⏰ Timeout esperando precio'));
-    }, 15000);
+    wspublic.connect(false); // sin auth
   });
 }
 
-async function esperarEjecucion(orderId) {
-  return new Promise((resolve) => {
-    ordenesPendientes.set(orderId, resolve);
-  });
-}
-
-async function ejecutarScalping(config) {
+async function iniciarCiclo(config) {
   try {
-    console.log(`🟢 Iniciando ejecutarScalping para ${config.symbol}`);
-    const { symbol, amount, profitMargin, entryDiscountPercentage } = config;
+    const { symbol, amount, profitMargin, entryDiscountPercentage, botId } = config;
     if (currentAmount === null) currentAmount = amount;
 
-    // Obtener el precio actual del mercado
+    //const wsPublicClient = new WsClient('wss://ws.bitget.com/v2/ws/public', { receive: () => {} });
     const currentPrice = await obtenerPrecio(symbol);
-    console.log(`📈 Precio actual: ${currentPrice}`);
 
-    // Calcular el precio de entrada con el descuento
+    /* 💡 Cerrar después de obtener precio
+    if (wsPublicClient.socket?.readyState === 1) {
+      wsPublicClient.close();
+    }*/
+
     const entryPrice = currentPrice * (1 - entryDiscountPercentage);
     const quantity = (currentAmount / entryPrice).toFixed(6);
-    console.log(`➡️ Intentando comprar ${quantity} ${symbol} a ${entryPrice.toFixed(6)} USDT`);
 
-    // Colocar la orden limit de compra usando placeLimitOrder
+    console.log(`➡️ Colocando orden de compra: ${quantity} ${symbol} a ${entryPrice.toFixed(6)} USDT`);
+
     const buyOrder = await placeLimitOrder({
       symbol,
       side: 'buy',
-      price: entryPrice.toFixed(6), // Precio calculado con entryDiscount
-      size: quantity, // Cantidad calculada
-      clientOid: `orden-compra-${Date.now()}`, // ID único para la orden
+      price: entryPrice.toFixed(6),
+      size: quantity,
+      clientOid: `orden-compra-${Date.now()}`
     });
 
     const buyOrderId = buyOrder?.data?.orderId;
-    if (!buyOrderId) throw new Error('❌ No se recibió orderId en respuesta de compra');
-    console.log(`🟢 Orden de compra enviada: ${buyOrderId}`);
+    console.log(`➡️ Orden de --COMPRA-- puesta ${buyOrderId}`);
 
-    // Esperar a que la orden se ejecute
-    await esperarEjecucion(buyOrderId);
-    logOperacion(config.botId, {
-      tipo: 'compra',
-      precio: entryPrice,
-      monto: currentAmount,
-      symbol
-    });
+    if (!buyOrderId) throw new Error('❌ No se recibió orderId de compra');
 
-    // Calcular el precio de venta y colocar la orden limit de venta
-    const sellPrice = entryPrice * (1 + profitMargin);
-    const sellQty = (currentAmount / entryPrice).toFixed(6);
-
-    const sellOrder = await placeLimitOrder({
+    ordenActual = {
+      botId,
       symbol,
-      side: 'sell',
-      price: sellPrice.toFixed(6), // Precio calculado para la venta
-      size: sellQty, // Cantidad calculada
-      clientOid: `orden-venta-${Date.now()}`, // ID único para la orden
-    });
+      profitMargin,
+      entryPrice,
+      orderId: buyOrderId
+    };
+    faseActual = 'comprando';
 
-    const sellOrderId = sellOrder?.data?.orderId;
-    if (!sellOrderId) throw new Error('❌ No se recibió orderId en respuesta de venta');
-    console.log(`📤 Orden de venta enviada: ${sellOrderId}`);
-
-    // Esperar a que la orden de venta se ejecute
-    await esperarEjecucion(sellOrderId);
-    logOperacion(config.botId, {
-      tipo: 'venta',
-      precio: sellPrice,
-      monto: currentAmount,
-      symbol
-    });
-
-    // Actualizar el monto actual después de la venta
-    currentAmount *= (1 + profitMargin);
-    console.log(`📊 Monto actualizado: ${currentAmount.toFixed(6)} USDT`);
-
-  } catch (error) {
-    console.error('❗ Error durante el ciclo:', error.message || error);
-    if (error.response?.data) {
-      console.error('❗ Respuesta del API:', JSON.stringify(error.response.data, null, 2));
+    //console.log(`🟢 Orden de compra enviada: ${buyOrderId}`);
+  } catch (err) {
+      console.error('❗ Error en el ciclo de trading:');
+      if (err.response?.data) {
+        console.error('📦 Respuesta de la API:', JSON.stringify(err.response.data, null, 2));
+      } else if (err.message) {
+        console.error('💬 Mensaje:', err.message);
+      } else if (typeof err === 'object') {
+        console.error('📋 Detalles:', JSON.stringify(err, null, 2));
+      } else {
+        console.error('🧨 Error desconocido:', err.message || err);
+      }
     }
-  }
 }
 
-let botsActivos = new Map();
-
 function ejecutarTradeLoop(config, id, onMontoUpdate = () => {}) {
-  const { symbol } = config; // El par de trading viene desde el frontend
+  console.log('📋 Config actual:\n', JSON.stringify(config, null, 2));
+  const { symbol } = config;
+  symbolMonitoreado = symbol;
+  configInicial = { ...config };
   botsActivos.set(id, { activo: true, monto: config.amount });
   console.log(`🤖 Bot iniciado para ${symbol}`);
-
-  wsClient.on('open', () => {
-    console.log('✅ WebSocket conectando ejecutarTradeLoop');
+  /*wsClient.on('open', () => {
     wsClient.login();
-    console.log('🔒 Autenticación exitosa en el WebSocket privado.');
-    
-    const subscribeReq = {
-      op: 'subscribe',
-      args: [
-        {
-          instType: 'SPOT',
-          channel: 'orders',
-          instId: symbol || 'default' // Usar el par dinámico o 'default' si no está definido
-        }
-      ]
-    };/*
-    wsClient.on('open', () => {
-      console.log('✅ WebSocket conectado ejecutarTradeLoop');
-      wsClient.subscribe([
-        { instType: 'SPOT', channel: 'orders', instId: symbol },
-        { instType: 'SPOT', channel: 'ticker', instId: symbol }
-      ]);
-    });*/
-    wsClient.send(JSON.stringify(subscribeReq));
-    console.log(`sendInfo:${JSON.stringify(subscribeReq)}`);
-  });
-
-  // Escuchar mensajes del WebSocket para confirmar la conexión al canal privado
-  wsClient.on('message', (data) => {
-    try {
-      const msg = JSON.parse(data);
-      if (msg.event === 'subscribe' && msg.code === 0) {
-        console.log(`✅ Conexión exitosa al canal privado: ${JSON.stringify(msg)}`);
-      } else if (msg.event === 'error') {
-        console.error(`❌ Error al conectar al canal privado: ${msg.code} - ${msg.msg}`);
-      }
-    } catch (error) {
-      console.error('❌ Error al procesar el mensaje del WebSocket:', error);
-    }
-  });
-
-  wsClient.on('error', (error) => {
-    console.error('❌ WS Error:', error);
-  });
-
-  (async function loop() {
-    while (botsActivos.get(id)?.activo) {
-      console.log(`🔄 Ejecutando ciclo de scalping para el bot con ID: ${id}`);
-      await ejecutarScalping(config);
-      onMontoUpdate(botsActivos.get(id).monto);
-      console.log('⏸️ Esperando 5 segundos antes del próximo ciclo...');
-      await new Promise(res => setTimeout(res, 5000));
-    }
-    console.log(`🛑 Bot detenido para ${symbol} con ID: ${id}`);
-  })();
+    wsClient.subscribe([
+      new SubscribeReq('SPOT', 'orders', symbol)
+    ]);
+  });*/
+  wsClient.connect(true);
+  iniciarCiclo(config);
 }
 
 function detenerBot(id) {

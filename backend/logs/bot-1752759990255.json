@@ -1,0 +1,23 @@
+[
+  {
+    "tipo": "compra",
+    "precio": 0.0024341220000000004,
+    "monto": 2,
+    "symbol": "RIFSOLUSDT",
+    "hora": "2025-07-17T14:27:18.462Z"
+  },
+  {
+    "tipo": "venta",
+    "precio": 0.0024438584880000004,
+    "monto": 2,
+    "symbol": "RIFSOLUSDT",
+    "hora": "2025-07-17T14:27:19.198Z"
+  },
+  {
+    "tipo": "compra",
+    "precio": 0.002439112,
+    "monto": 2.0039862541850404,
+    "symbol": "RIFSOLUSDT",
+    "hora": "2025-07-17T14:47:51.490Z"
+  }
+]

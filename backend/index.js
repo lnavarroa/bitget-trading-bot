@@ -1,3 +1,17 @@
+const originalLog = console.log;
+console.log = (...args) => {
+  if (
+    args[0] &&
+    typeof args[0] === 'string' &&
+    args[0].startsWith('request:') &&
+    args[1] === undefined
+  ) {
+    // No imprimir nada
+    return;
+  }
+  originalLog(...args);
+};
+
 const express = require('express');
 const cors = require('cors');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));

@@ -1,0 +1,1344 @@
+📥 Evento 'orders' recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329198260892909568","clientOid":"orden-compra-1752631480982","price":"0.002297","size":"2.00013572","newSize":"870.76","notional":"2.00013572","orderType":"limit","force":"gtc","side":"buy","fillPrice":"0.002297","tradeId":"1329198531428536500","baseVolume":"870.76","fillTime":"1752631545884","fillFee":"-0.87076","fillFeeCoin":"RIFSOL","tradeScope":"M","accBaseVolume":"870.76","priceAvg":"0.002297","status":"partially_filled","cTime":"1752631481383","uTime":"1752631545897","feeDetail":[{"feeCoin":"RIFSOL","fee":"-0.87076"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752631545907}
+
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329198260892909568",
+      "clientOid": "orden-compra-1752631480982",
+      "price": "0.002297",
+      "size": "2.00013572",
+      "newSize": "870.76",
+      "notional": "2.00013572",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "buy",
+      "fillPrice": "0.002297",
+      "tradeId": "1329198531428536500",
+      "baseVolume": "870.76",
+      "fillTime": "1752631545884",
+      "fillFee": "-0.87076",
+      "fillFeeCoin": "RIFSOL",
+      "tradeScope": "M",
+      "accBaseVolume": "870.76",
+      "priceAvg": "0.002297",
+      "status": "partially_filled",
+      "cTime": "1752631481383",
+      "uTime": "1752631545897",
+      "feeDetail": [
+        {
+          "feeCoin": "RIFSOL",
+          "fee": "-0.87076"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752631545907
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329198260892909568",
+  "clientOid": "orden-compra-1752631480982",
+  "price": "0.002297",
+  "size": "2.00013572",
+  "newSize": "870.76",
+  "notional": "2.00013572",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "buy",
+  "fillPrice": "0.002297",
+  "tradeId": "1329198531428536500",
+  "baseVolume": "870.76",
+  "fillTime": "1752631545884",
+  "fillFee": "-0.87076",
+  "fillFeeCoin": "RIFSOL",
+  "tradeScope": "M",
+  "accBaseVolume": "870.76",
+  "priceAvg": "0.002297",
+  "status": "partially_filled",
+  "cTime": "1752631481383",
+  "uTime": "1752631545897",
+  "feeDetail": [
+    {
+      "feeCoin": "RIFSOL",
+      "fee": "-0.87076"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329198260892909568","clientOid":"orden-compra-1752631480982","price":"0.002297","size":"2.00013572","newSize":"870.76","notional":"2.00013572","orderType":"limit","force":"gtc","side":"buy","fillPrice":"0.002297","tradeId":"1329198531428536500","baseVolume":"870.76","fillTime":"1752631545884","fillFee":"-0.87076","fillFeeCoin":"RIFSOL","tradeScope":"M","accBaseVolume":"870.76","priceAvg":"0.002297","status":"partially_filled","cTime":"1752631481383","uTime":"1752631545897","feeDetail":[{"feeCoin":"RIFSOL","fee":"-0.87076"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752631545907}
+
+📥 Evento 'orders' recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329198260892909568","clientOid":"orden-compra-1752631480982","price":"0.002297","size":"2.00013572","newSize":"870.76","notional":"2.00013572","orderType":"limit","force":"gtc","side":"buy","accBaseVolume":"870.76","priceAvg":"0.002297","status":"filled","cTime":"1752631481383","uTime":"1752631545897","feeDetail":[{"feeCoin":"RIFSOL","fee":"-0.87076"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752631545909}
+
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329198260892909568",
+      "clientOid": "orden-compra-1752631480982",
+      "price": "0.002297",
+      "size": "2.00013572",
+      "newSize": "870.76",
+      "notional": "2.00013572",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "buy",
+      "accBaseVolume": "870.76",
+      "priceAvg": "0.002297",
+      "status": "filled",           //////-----filled------/////
+      "cTime": "1752631481383",
+      "uTime": "1752631545897",
+      "feeDetail": [
+        {
+          "feeCoin": "RIFSOL",
+          "fee": "-0.87076"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752631545909
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329198260892909568",
+  "clientOid": "orden-compra-1752631480982",
+  "price": "0.002297",
+  "size": "2.00013572",
+  "newSize": "870.76",
+  "notional": "2.00013572",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "buy",
+  "accBaseVolume": "870.76",
+  "priceAvg": "0.002297",
+  "status": "filled",
+  "cTime": "1752631481383",
+  "uTime": "1752631545897",
+  "feeDetail": [
+    {
+      "feeCoin": "RIFSOL",
+      "fee": "-0.87076"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+✅ Orden COMPRA completada (buy): 1329198260892909568
+precio venta: 0.0023060384040000004, cantidad comprada 870.76, fee: -0.87076, cantidad venta; 869.889240 
+
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329198260892909568","clientOid":"orden-compra-1752631480982","price":"0.002297","size":"2.00013572","newSize":"870.76","notional":"2.00013572","orderType":"limit","force":"gtc","side":"buy","accBaseVolume":"870.76","priceAvg":"0.002297","status":"filled","cTime":"1752631481383","uTime":"1752631545897","feeDetail":[{"feeCoin":"RIFSOL","fee":"-0.87076"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752631545909}
+
+📥 Evento 'orders' recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329198533367480322","clientOid":"orden-venta-1752631546104","price":"0.002306","size":"869.89","newSize":"869.89","orderType":"limit","force":"gtc","side":"sell","accBaseVolume":"0","priceAvg":"0","status":"live","cTime":"1752631546346","uTime":"1752631546346","feeDetail":[],"enterPointSource":"API","stpMode":"none"}],"ts":1752631546355}
+
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329198533367480322",
+      "clientOid": "orden-venta-1752631546104",
+      "price": "0.002306",
+      "size": "869.89",
+      "newSize": "869.89",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "sell",
+      "accBaseVolume": "0",
+      "priceAvg": "0",
+      "status": "live",
+      "cTime": "1752631546346",
+      "uTime": "1752631546346",
+      "feeDetail": [],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752631546355
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329198533367480322",
+  "clientOid": "orden-venta-1752631546104",
+  "price": "0.002306",
+  "size": "869.89",
+  "newSize": "869.89",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "sell",
+  "accBaseVolume": "0",
+  "priceAvg": "0",
+  "status": "live",
+  "cTime": "1752631546346",
+  "uTime": "1752631546346",
+  "feeDetail": [],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329198533367480322","clientOid":"orden-venta-1752631546104","price":"0.002306","size":"869.89","newSize":"869.89","orderType":"limit","force":"gtc","side":"sell","accBaseVolume":"0","priceAvg":"0","status":"live","cTime":"1752631546346","uTime":"1752631546346","feeDetail":[],"enterPointSource":"API","stpMode":"none"}],"ts":1752631546355}
+
+📤 Orden enviada: {"code":"00000","msg":"success","requestTime":1752631546344,"data":{"orderId":"1329198533367480322","clientOid":"orden-venta-1752631546104"}}
+
+📤 Orden de venta enviada: 1329198533367480322
+
+
+
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329208880375709697","clientOid":"orden-venta-1752634012924","price":"0.002274","size":"882.17","newSize":"882.17","orderType":"limit","force":"gtc","side":"sell","accBaseVolume":"0","priceAvg":"0","status":"live","cTime":"1752634013265","uTime":"1752634013265","feeDetail":[],"enterPointSource":"API","stpMode":"none"}],"ts":1752634013273}
+📥 Evento 'orders' recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329208880375709697","clientOid":"orden-venta-1752634012924","price":"0.002274","size":"882.17","newSize":"882.17","orderType":"limit","force":"gtc","side":"sell","fillPrice":"0.002274","tradeId":"1329209481636401155","baseVolume":"882.17","fillTime":"1752634156617","fillFee":"-0.00200605458","fillFeeCoin":"USDT","tradeScope":"M","accBaseVolume":"882.17","priceAvg":"0.002274","status":"partially_filled","cTime":"1752634013265","uTime":"1752634156631","feeDetail":[{"feeCoin":"USDT","fee":"-0.00200605458"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752634156640}
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329208880375709697",
+      "clientOid": "orden-venta-1752634012924",
+      "price": "0.002274",
+      "size": "882.17",
+      "newSize": "882.17",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "sell",
+      "fillPrice": "0.002274",
+      "tradeId": "1329209481636401155",
+      "baseVolume": "882.17",
+      "fillTime": "1752634156617",
+      "fillFee": "-0.00200605458",
+      "fillFeeCoin": "USDT",
+      "tradeScope": "M",
+      "accBaseVolume": "882.17",
+      "priceAvg": "0.002274",
+      "status": "partially_filled",
+      "cTime": "1752634013265",
+      "uTime": "1752634156631",
+      "feeDetail": [
+        {
+          "feeCoin": "USDT",
+          "fee": "-0.00200605458"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752634156640
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329208880375709697",
+  "clientOid": "orden-venta-1752634012924",
+  "price": "0.002274",
+  "size": "882.17",
+  "newSize": "882.17",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "sell",
+  "fillPrice": "0.002274",
+  "tradeId": "1329209481636401155",
+  "baseVolume": "882.17",
+  "fillTime": "1752634156617",
+  "fillFee": "-0.00200605458",
+  "fillFeeCoin": "USDT",
+  "tradeScope": "M",
+  "accBaseVolume": "882.17",
+  "priceAvg": "0.002274",
+  "status": "partially_filled",
+  "cTime": "1752634013265",
+  "uTime": "1752634156631",
+  "feeDetail": [
+    {
+      "feeCoin": "USDT",
+      "fee": "-0.00200605458"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329208880375709697","clientOid":"orden-venta-1752634012924","price":"0.002274","size":"882.17","newSize":"882.17","orderType":"limit","force":"gtc","side":"sell","fillPrice":"0.002274","tradeId":"1329209481636401155","baseVolume":"882.17","fillTime":"1752634156617","fillFee":"-0.00200605458","fillFeeCoin":"USDT","tradeScope":"M","accBaseVolume":"882.17","priceAvg":"0.002274","status":"partially_filled","cTime":"1752634013265","uTime":"1752634156631","feeDetail":[{"feeCoin":"USDT","fee":"-0.00200605458"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752634156640}
+📥 Evento 'orders' recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329208880375709697","clientOid":"orden-venta-1752634012924","price":"0.002274","size":"882.17","newSize":"882.17","orderType":"limit","force":"gtc","side":"sell","accBaseVolume":"882.17","priceAvg":"0.002274","status":"filled","cTime":"1752634013265","uTime":"1752634156631","feeDetail":[{"feeCoin":"USDT","fee":"-0.00200605458"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752634156641}
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329208880375709697",
+      "clientOid": "orden-venta-1752634012924",
+      "price": "0.002274",
+      "size": "882.17",
+      "newSize": "882.17",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "sell",
+      "accBaseVolume": "882.17",
+      "priceAvg": "0.002274",
+      "status": "filled",
+      "cTime": "1752634013265",
+      "uTime": "1752634156631",
+      "feeDetail": [
+        {
+          "feeCoin": "USDT",
+          "fee": "-0.00200605458"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752634156641
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329208880375709697",
+  "clientOid": "orden-venta-1752634012924",
+  "price": "0.002274",
+  "size": "882.17",
+  "newSize": "882.17",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "sell",                         
+  "accBaseVolume": "882.17",
+  "priceAvg": "0.002274",
+  "status": "filled",                         ----****venta filled****----
+  "cTime": "1752634013265",
+  "uTime": "1752634156631",
+  "feeDetail": [
+    {
+      "feeCoin": "USDT",
+      "fee": "-0.00200605458"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+✅ Orden VENTA completada (sell): 1329208880375709697
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329208880375709697","clientOid":"orden-venta-1752634012924","price":"0.002274","size":"882.17","newSize":"882.17","orderType":"limit","force":"gtc","side":"sell","accBaseVolume":"882.17","priceAvg":"0.002274","status":"filled","cTime":"1752634013265","uTime":"1752634156631","feeDetail":[{"feeCoin":"USDT","fee":"-0.00200605458"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752634156641}
+/home/sunze/web/bitget-trading-bot/backend/services/tradeBot.js:91
+      console.log(`precio venta: ${sellPrice}, cantidad comprada ${cantidadComprada}, fee: ${fee}, cantidad venta; ${sellQty} `);
+                                   ^
+
+ReferenceError: sellPrice is not defined
+    at WsClient.<anonymous> (/home/sunze/web/bitget-trading-bot/backend/services/tradeBot.js:91:36)
+    at WsClient.emit (node:events:513:28)
+    at WebSocket.<anonymous> (/home/sunze/web/bitget-trading-bot/backend/websocket/wsClient.js:61:16)
+    at WebSocket.emit (node:events:513:28)
+    at Receiver.receiverOnMessage (/home/sunze/web/bitget-trading-bot/backend/node_modules/ws/lib/websocket.js:789:20)
+    at Receiver.emit (node:events:513:28)
+    at Receiver.dataMessage (/home/sunze/web/bitget-trading-bot/backend/node_modules/ws/lib/receiver.js:422:14)
+    at Receiver.getData (/home/sunze/web/bitget-trading-bot/backend/node_modules/ws/lib/receiver.js:352:17)
+    at Receiver.startLoop (/home/sunze/web/bitget-trading-bot/backend/node_modules/ws/lib/receiver.js:138:22)
+    at Receiver._write (/home/sunze/web/bitget-trading-bot/backend/node_modules/ws/lib/receiver.js:74:10)
+
+Node.js v23.5.0
+
+
+********---------16-Julio-2025_21-01hrs---
+********---------16-Julio-2025_21-01hrs---
+********---------16-Julio-2025_21-01hrs---
+********---------16-Julio-2025_21-01hrs---
+********---------16-Julio-2025_21-01hrs---
+
+
+⚠️ Orden recibida pero ignorada por símbolo. Esperado: undefined Recibido: RIFSOLUSDT
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329536906527424512","clientOid":"orden-compra-1752712215501","price":"0.002392","size":"2.00033392","newSize":"836.26","notional":"2.00033392","orderType":"limit","force":"gtc","side":"buy","accBaseVolume":"0","priceAvg":"0","status":"live","cTime":"1752712220794","uTime":"1752712220794","feeDetail":[],"enterPointSource":"API","stpMode":"none"}],"ts":1752712220803}
+📤 Orden enviada: {"code":"00000","msg":"success","requestTime":1752712220784,"data":{"orderId":"1329536906527424512","clientOid":"orden-compra-1752712215501"}}
+➡️ Orden de --COMPRA-- puesta 1329536906527424512
+❌ Error al obtener el balance: Cannot read properties of undefined (reading 'data')
+❌ Error al obtener el balance: Cannot read properties of undefined (reading 'data')
+❌ Error al obtener el balance: Cannot read properties of undefined (reading 'data')
+❌ Error al obtener el balance: Cannot read properties of undefined (reading 'data')
+🤖 Bot iniciado con ID: 1752713098795 para el par RIFSOLUSDT
+🤖 Bot iniciado para RIFSOLUSDT
+⚠️ WebSocket ya conectado o en proceso de conexión.
+✅ WebSocket conectado: wss://ws.bitget.com/v2/ws/public
+📤 Enviando solicitud de suscripción: {"op":"subscribe","args":[{"instType":"SPOT","channel":"ticker","instId":"RIFSOLUSDT"}]}
+📥 Primer mensaje del canal 'ticker': {"event":"subscribe","arg":{"instType":"SPOT","channel":"ticker","instId":"RIFSOLUSDT"}}
+➡️ Colocando orden de compra: 831.671031 RIFSOLUSDT a 0.002405 USDT
+❌ WebSocket cerrado
+📤 Orden enviada: {"code":"00000","msg":"success","requestTime":1752713101013,"data":{"orderId":"1329540598450274306","clientOid":"orden-compra-1752713100706"}}
+➡️ Orden de --COMPRA-- puesta 1329540598450274306
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329540598450274306",
+      "clientOid": "orden-compra-1752713100706",
+      "price": "0.002405",
+      "size": "2.00016635",
+      "newSize": "831.67",
+      "notional": "2.00016635",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "buy",
+      "accBaseVolume": "0",
+      "priceAvg": "0",
+      "status": "live",
+      "cTime": "1752713101017",
+      "uTime": "1752713101017",
+      "feeDetail": [],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752713101024
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329540598450274306",
+  "clientOid": "orden-compra-1752713100706",
+  "price": "0.002405",
+  "size": "2.00016635",
+  "newSize": "831.67",
+  "notional": "2.00016635",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "buy",
+  "accBaseVolume": "0",
+  "priceAvg": "0",
+  "status": "live",
+  "cTime": "1752713101017",
+  "uTime": "1752713101017",
+  "feeDetail": [],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329540598450274306","clientOid":"orden-compra-1752713100706","price":"0.002405","size":"2.00016635","newSize":"831.67","notional":"2.00016635","orderType":"limit","force":"gtc","side":"buy","accBaseVolume":"0","priceAvg":"0","status":"live","cTime":"1752713101017","uTime":"1752713101017","feeDetail":[],"enterPointSource":"API","stpMode":"none"}],"ts":1752713101024}
+******
+*****
+****
+***
+**
+*
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329540598450274306",
+      "clientOid": "orden-compra-1752713100706",
+      "price": "0.002405",
+      "size": "2.00016635",
+      "newSize": "831.67",
+      "notional": "2.00016635",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "buy",
+      "fillPrice": "0.002405",
+      "tradeId": "1329544322387070978",
+      "baseVolume": "831.67",
+      "fillTime": "1752713988873",
+      "fillFee": "-0.83167",
+      "fillFeeCoin": "RIFSOL",
+      "tradeScope": "M",
+      "accBaseVolume": "831.67",
+      "priceAvg": "0.002405",
+      "status": "partially_filled",
+      "cTime": "1752713101017",
+      "uTime": "1752713988888",
+      "feeDetail": [
+        {
+          "feeCoin": "RIFSOL",
+          "fee": "-0.83167"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752713988897
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329540598450274306",
+  "clientOid": "orden-compra-1752713100706",
+  "price": "0.002405",
+  "size": "2.00016635",
+  "newSize": "831.67",
+  "notional": "2.00016635",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "buy",
+  "fillPrice": "0.002405",
+  "tradeId": "1329544322387070978",
+  "baseVolume": "831.67",
+  "fillTime": "1752713988873",
+  "fillFee": "-0.83167",
+  "fillFeeCoin": "RIFSOL",
+  "tradeScope": "M",
+  "accBaseVolume": "831.67",
+  "priceAvg": "0.002405",
+  "status": "partially_filled",
+  "cTime": "1752713101017",
+  "uTime": "1752713988888",
+  "feeDetail": [
+    {
+      "feeCoin": "RIFSOL",
+      "fee": "-0.83167"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329540598450274306","clientOid":"orden-compra-1752713100706","price":"0.002405","size":"2.00016635","newSize":"831.67","notional":"2.00016635","orderType":"limit","force":"gtc","side":"buy","fillPrice":"0.002405","tradeId":"1329544322387070978","baseVolume":"831.67","fillTime":"1752713988873","fillFee":"-0.83167","fillFeeCoin":"RIFSOL","tradeScope":"M","accBaseVolume":"831.67","priceAvg":"0.002405","status":"partially_filled","cTime":"1752713101017","uTime":"1752713988888","feeDetail":[{"feeCoin":"RIFSOL","fee":"-0.83167"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752713988897}
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329536906527424512",
+      "clientOid": "orden-compra-1752712215501",
+      "price": "0.002392",
+      "size": "2.00033392",
+      "newSize": "836.26",
+      "notional": "2.00033392",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "buy",
+      "fillPrice": "0.002392",
+      "tradeId": "1329544322387070999",
+      "baseVolume": "836.26",
+      "fillTime": "1752713988873",
+      "fillFee": "-0.83626",
+      "fillFeeCoin": "RIFSOL",
+      "tradeScope": "M",
+      "accBaseVolume": "836.26",
+      "priceAvg": "0.002392",
+      "status": "partially_filled",
+      "cTime": "1752712220794",
+      "uTime": "1752713988889",
+      "feeDetail": [
+        {
+          "feeCoin": "RIFSOL",
+          "fee": "-0.83626"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752713988898
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329536906527424512",
+  "clientOid": "orden-compra-1752712215501",
+  "price": "0.002392",
+  "size": "2.00033392",
+  "newSize": "836.26",
+  "notional": "2.00033392",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "buy",
+  "fillPrice": "0.002392",
+  "tradeId": "1329544322387070999",
+  "baseVolume": "836.26",
+  "fillTime": "1752713988873",
+  "fillFee": "-0.83626",
+  "fillFeeCoin": "RIFSOL",
+  "tradeScope": "M",
+  "accBaseVolume": "836.26",
+  "priceAvg": "0.002392",
+  "status": "partially_filled",
+  "cTime": "1752712220794",
+  "uTime": "1752713988889",
+  "feeDetail": [
+    {
+      "feeCoin": "RIFSOL",
+      "fee": "-0.83626"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329536906527424512","clientOid":"orden-compra-1752712215501","price":"0.002392","size":"2.00033392","newSize":"836.26","notional":"2.00033392","orderType":"limit","force":"gtc","side":"buy","fillPrice":"0.002392","tradeId":"1329544322387070999","baseVolume":"836.26","fillTime":"1752713988873","fillFee":"-0.83626","fillFeeCoin":"RIFSOL","tradeScope":"M","accBaseVolume":"836.26","priceAvg":"0.002392","status":"partially_filled","cTime":"1752712220794","uTime":"1752713988889","feeDetail":[{"feeCoin":"RIFSOL","fee":"-0.83626"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752713988898}
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329536906527424512",
+      "clientOid": "orden-compra-1752712215501",
+      "price": "0.002392",
+      "size": "2.00033392",
+      "newSize": "836.26",
+      "notional": "2.00033392",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "buy",
+      "accBaseVolume": "836.26",
+      "priceAvg": "0.002392",
+      "status": "filled",                 ----****filled****----
+      "cTime": "1752712220794",
+      "uTime": "1752713988889",
+      "feeDetail": [
+        {
+          "feeCoin": "RIFSOL",
+          "fee": "-0.83626"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752713988900
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329536906527424512",
+  "clientOid": "orden-compra-1752712215501",
+  "price": "0.002392",
+  "size": "2.00033392",
+  "newSize": "836.26",
+  "notional": "2.00033392",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "buy",
+  "accBaseVolume": "836.26",
+  "priceAvg": "0.002392",
+  "status": "filled",
+  "cTime": "1752712220794",
+  "uTime": "1752713988889",
+  "feeDetail": [
+    {
+      "feeCoin": "RIFSOL",
+      "fee": "-0.83626"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+✅ Orden COMPRA completada (buy): 1329536906527424512
+precio venta: 0.002414416188, cantidad comprada 836.26, fee: -0.83626, cantidad venta; 835.423740 
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329536906527424512","clientOid":"orden-compra-1752712215501","price":"0.002392","size":"2.00033392","newSize":"836.26","notional":"2.00033392","orderType":"limit","force":"gtc","side":"buy","accBaseVolume":"836.26","priceAvg":"0.002392","status":"filled","cTime":"1752712220794","uTime":"1752713988889","feeDetail":[{"feeCoin":"RIFSOL","fee":"-0.83626"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752713988900}
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329540598450274306",
+      "clientOid": "orden-compra-1752713100706",
+      "price": "0.002405",
+      "size": "2.00016635",
+      "newSize": "831.67",
+      "notional": "2.00016635",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "buy",
+      "accBaseVolume": "831.67",
+      "priceAvg": "0.002405",
+      "status": "filled",                     ----****filled****----
+      "cTime": "1752713101017",
+      "uTime": "1752713988889",
+      "feeDetail": [
+        {
+          "feeCoin": "RIFSOL",
+          "fee": "-0.83167"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752713988902
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329540598450274306",
+  "clientOid": "orden-compra-1752713100706",
+  "price": "0.002405",
+  "size": "2.00016635",
+  "newSize": "831.67",
+  "notional": "2.00016635",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "buy",
+  "accBaseVolume": "831.67",
+  "priceAvg": "0.002405",
+  "status": "filled",                 ----****filled****----
+  "cTime": "1752713101017",
+  "uTime": "1752713988889",
+  "feeDetail": [
+    {
+      "feeCoin": "RIFSOL",
+      "fee": "-0.83167"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+✅ Orden COMPRA completada (buy): 1329540598450274306
+precio venta: 0.002414416188, cantidad comprada 831.67, fee: -0.83167, cantidad venta; 830.838330 
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329540598450274306","clientOid":"orden-compra-1752713100706","price":"0.002405","size":"2.00016635","newSize":"831.67","notional":"2.00016635","orderType":"limit","force":"gtc","side":"buy","accBaseVolume":"831.67","priceAvg":"0.002405","status":"filled","cTime":"1752713101017","uTime":"1752713988889","feeDetail":[{"feeCoin":"RIFSOL","fee":"-0.83167"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752713988902}
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {                                             
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329544324397318151",
+      "clientOid": "orden-venta-1752713989103",
+      "price": "0.002414",
+      "size": "830.84",
+      "newSize": "830.84",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "sell",
+      "accBaseVolume": "0",
+      "priceAvg": "0",
+      "status": "live",                       ----****limit venta puesta****----
+      "cTime": "1752713989352",
+      "uTime": "1752713989352",
+      "feeDetail": [],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752713989360
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329544324397318151",
+  "clientOid": "orden-venta-1752713989103",
+  "price": "0.002414",
+  "size": "830.84",
+  "newSize": "830.84",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "sell",
+  "accBaseVolume": "0",
+  "priceAvg": "0",
+  "status": "live",                               ----****limit venta puesta****----
+  "cTime": "1752713989352",
+  "uTime": "1752713989352",
+  "feeDetail": [],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329544324397318151","clientOid":"orden-venta-1752713989103","price":"0.002414","size":"830.84","newSize":"830.84","orderType":"limit","force":"gtc","side":"sell","accBaseVolume":"0","priceAvg":"0","status":"live","cTime":"1752713989352","uTime":"1752713989352","feeDetail":[],"enterPointSource":"API","stpMode":"none"}],"ts":1752713989360}
+📤 Orden enviada: {"code":"00000","msg":"success","requestTime":1752713989345,"data":{"orderId":"1329544324397318151","clientOid":"orden-venta-1752713989103"}}
+📤 Orden de venta enviada: 1329544324397318151
+📤 Orden enviada: {"code":"00000","msg":"success","requestTime":1752713989405,"data":{"orderId":"1329544324648976389","clientOid":"orden-venta-1752713989088"}}
+📤 Orden de venta enviada: 1329544324648976389
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329544324648976389",
+      "clientOid": "orden-venta-1752713989088",
+      "price": "0.002414",
+      "size": "835.42",
+      "newSize": "835.42",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "sell",
+      "accBaseVolume": "0",
+      "priceAvg": "0",
+      "status": "live",
+      "cTime": "1752713989412",
+      "uTime": "1752713989412",
+      "feeDetail": [],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752713989419
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329544324648976389",
+  "clientOid": "orden-venta-1752713989088",
+  "price": "0.002414",
+  "size": "835.42",
+  "newSize": "835.42",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "sell",
+  "accBaseVolume": "0",
+  "priceAvg": "0",
+  "status": "live",
+  "cTime": "1752713989412",
+  "uTime": "1752713989412",
+  "feeDetail": [],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329544324648976389","clientOid":"orden-venta-1752713989088","price":"0.002414","size":"835.42","newSize":"835.42","orderType":"limit","force":"gtc","side":"sell","accBaseVolume":"0","priceAvg":"0","status":"live","cTime":"1752713989412","uTime":"1752713989412","feeDetail":[],"enterPointSource":"API","stpMode":"none"}],"ts":1752713989419}
+
+
+
+
+****----17julio2025-11:12hrs----****
+****----17julio2025-11:12hrs----****
+****----17julio2025-11:12hrs----****
+****----17julio2025-11:12hrs----****
+****----17julio2025-11:12hrs----****
+
+
+"size": "1.9998961",
+  "newSize": "821.65",
+  "notional": "1.9998961",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "buy",
+  "accBaseVolume": "821.65",
+  "priceAvg": "0.002434",
+  "status": "filled",
+  "cTime": "1752759992559",
+  "uTime": "1752762438267",
+  "feeDetail": [
+    {
+      "feeCoin": "RIFSOL",
+      "fee": "-0.82165"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+✅ Orden COMPRA completada (buy): 1329737275832451072
+precio venta: 0.0024438584880000004, cantidad comprada 821.65, fee: -0.82165, cantidad venta; 820.828350 
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329737275832451072","clientOid":"orden-compra-1752759992331","price":"0.002434","size":"1.9998961","newSize":"821.65","notional":"1.9998961","orderType":"limit","force":"gtc","side":"buy","accBaseVolume":"821.65","priceAvg":"0.002434","status":"filled","cTime":"1752759992559","uTime":"1752762438267","feeDetail":[{"feeCoin":"RIFSOL","fee":"-0.82165"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752762438279}
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329747536479961091",
+      "clientOid": "orden-venta-1752762438580",
+      "price": "0.002444",
+      "size": "820.83",
+      "newSize": "820.83",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "sell",
+      "accBaseVolume": "0",
+      "priceAvg": "0",
+      "status": "live",
+      "cTime": "1752762438888",
+      "uTime": "1752762438888",
+      "feeDetail": [],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752762438897
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329747536479961091",
+  "clientOid": "orden-venta-1752762438580",
+  "price": "0.002444",
+  "size": "820.83",
+  "newSize": "820.83",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "sell",
+  "accBaseVolume": "0",
+  "priceAvg": "0",
+  "status": "live",
+  "cTime": "1752762438888",
+  "uTime": "1752762438888",
+  "feeDetail": [],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329747536479961091","clientOid":"orden-venta-1752762438580","price":"0.002444","size":"820.83","newSize":"820.83","orderType":"limit","force":"gtc","side":"sell","accBaseVolume":"0","priceAvg":"0","status":"live","cTime":"1752762438888","uTime":"1752762438888","feeDetail":[],"enterPointSource":"API","stpMode":"none"}],"ts":1752762438897}
+📤 Orden enviada: {"code":"00000","msg":"success","requestTime":1752762438880,"data":{"orderId":"1329747536479961091","clientOid":"orden-venta-1752762438580"}}
+📤 Orden de venta enviada: 1329747536479961091
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329747536479961091",
+      "clientOid": "orden-venta-1752762438580",
+      "price": "0.002444",
+      "size": "820.83",
+      "newSize": "820.83",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "sell",
+      "fillPrice": "0.002444",
+      "tradeId": "1329747536944353289",
+      "baseVolume": "820.83",
+      "fillTime": "1752762438999",
+      "fillFee": "-0.00200610852",
+      "fillFeeCoin": "USDT",
+      "tradeScope": "M",
+      "accBaseVolume": "820.83",
+      "priceAvg": "0.002444",
+      "status": "partially_filled",
+      "cTime": "1752762438888",
+      "uTime": "1752762439014",
+      "feeDetail": [
+        {
+          "feeCoin": "USDT",
+          "fee": "-0.00200610852"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752762439028
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329747536479961091",
+  "clientOid": "orden-venta-1752762438580",
+  "price": "0.002444",
+  "size": "820.83",
+  "newSize": "820.83",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "sell",
+  "fillPrice": "0.002444",
+  "tradeId": "1329747536944353289",
+  "baseVolume": "820.83",
+  "fillTime": "1752762438999",
+  "fillFee": "-0.00200610852",
+  "fillFeeCoin": "USDT",
+  "tradeScope": "M",
+  "accBaseVolume": "820.83",
+  "priceAvg": "0.002444",
+  "status": "partially_filled",
+  "cTime": "1752762438888",
+  "uTime": "1752762439014",
+  "feeDetail": [
+    {
+      "feeCoin": "USDT",
+      "fee": "-0.00200610852"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329747536479961091","clientOid":"orden-venta-1752762438580","price":"0.002444","size":"820.83","newSize":"820.83","orderType":"limit","force":"gtc","side":"sell","fillPrice":"0.002444","tradeId":"1329747536944353289","baseVolume":"820.83","fillTime":"1752762438999","fillFee":"-0.00200610852","fillFeeCoin":"USDT","tradeScope":"M","accBaseVolume":"820.83","priceAvg":"0.002444","status":"partially_filled","cTime":"1752762438888","uTime":"1752762439014","feeDetail":[{"feeCoin":"USDT","fee":"-0.00200610852"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752762439028}
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329747536479961091",
+      "clientOid": "orden-venta-1752762438580",
+      "price": "0.002444",
+      "size": "820.83",
+      "newSize": "820.83",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "sell",
+      "accBaseVolume": "820.83",
+      "priceAvg": "0.002444",
+      "status": "filled",                       ----****venta filled****----
+      "cTime": "1752762438888",
+      "uTime": "1752762439014",
+      "feeDetail": [
+        {
+          "feeCoin": "USDT",
+          "fee": "-0.00200610852"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752762439029
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329747536479961091",
+  "clientOid": "orden-venta-1752762438580",
+  "price": "0.002444",
+  "size": "820.83",
+  "newSize": "820.83",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "sell",
+  "accBaseVolume": "820.83",
+  "priceAvg": "0.002444",
+  "status": "filled",
+  "cTime": "1752762438888",
+  "uTime": "1752762439014",
+  "feeDetail": [
+    {
+      "feeCoin": "USDT",
+      "fee": "-0.00200610852"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+✅ Orden VENTA completada (sell): 1329747536479961091
+precio venta: 0.0024438584880000004, cantidad comprada: 820.83, fee USDT: 0.00200610852, cantidad venta: 820.830000
+📊 Monto actualizado: 2.003986 USDT
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329747536479961091","clientOid":"orden-venta-1752762438580","price":"0.002444","size":"820.83","newSize":"820.83","orderType":"limit","force":"gtc","side":"sell","accBaseVolume":"820.83","priceAvg":"0.002444","status":"filled","cTime":"1752762438888","uTime":"1752762439014","feeDetail":[{"feeCoin":"USDT","fee":"-0.00200610852"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752762439029}
+✅ WebSocket conectado: wss://ws.bitget.com/v2/ws/public
+📤 Enviando solicitud de suscripción: {"op":"subscribe","args":[{"instType":"SPOT","channel":"ticker","instId":"RIFSOLUSDT"}]}
+📥 Primer mensaje del canal 'ticker': {"event":"subscribe","arg":{"instType":"SPOT","channel":"ticker","instId":"RIFSOLUSDT"}}
+➡️ Colocando orden de compra: 821.604852 RIFSOLUSDT a 0.002439 USDT
+❌ WebSocket cerrado
+📤 Orden enviada: {"code":"00000","msg":"success","requestTime":1752762444776,"data":{"orderId":"1329747561184411649","clientOid":"orden-compra-1752762444569"}}
+➡️ Orden de --COMPRA-- puesta 1329747561184411649
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329747561184411649",
+      "clientOid": "orden-compra-1752762444569",
+      "price": "0.002439",
+      "size": "2.0038824",
+      "newSize": "821.6",
+      "notional": "2.0038824",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "buy",
+      "accBaseVolume": "0",
+      "priceAvg": "0",
+      "status": "live",
+      "cTime": "1752762444778",
+      "uTime": "1752762444778",
+      "feeDetail": [],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752762444789
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329747561184411649",
+  "clientOid": "orden-compra-1752762444569",
+  "price": "0.002439",
+  "size": "2.0038824",
+  "newSize": "821.6",
+  "notional": "2.0038824",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "buy",
+  "accBaseVolume": "0",
+  "priceAvg": "0",
+  "status": "live",
+  "cTime": "1752762444778",
+  "uTime": "1752762444778",
+  "feeDetail": [],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329747561184411649","clientOid":"orden-compra-1752762444569","price":"0.002439","size":"2.0038824","newSize":"821.6","notional":"2.0038824","orderType":"limit","force":"gtc","side":"buy","accBaseVolume":"0","priceAvg":"0","status":"live","cTime":"1752762444778","uTime":"1752762444778","feeDetail":[],"enterPointSource":"API","stpMode":"none"}],"ts":1752762444789}
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329747561184411649",
+      "clientOid": "orden-compra-1752762444569",
+      "price": "0.002439",
+      "size": "2.0038824",
+      "newSize": "821.6",
+      "notional": "2.0038824",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "buy",
+      "fillPrice": "0.002439",
+      "tradeId": "1329752705560006661",
+      "baseVolume": "821.6",
+      "fillTime": "1752763671293",
+      "fillFee": "-0.8216",
+      "fillFeeCoin": "RIFSOL",
+      "tradeScope": "M",
+      "accBaseVolume": "821.6",
+      "priceAvg": "0.002439",
+      "status": "partially_filled",
+      "cTime": "1752762444778",
+      "uTime": "1752763671307",
+      "feeDetail": [
+        {
+          "feeCoin": "RIFSOL",
+          "fee": "-0.8216"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752763671317
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329747561184411649",
+  "clientOid": "orden-compra-1752762444569",
+  "price": "0.002439",
+  "size": "2.0038824",
+  "newSize": "821.6",
+  "notional": "2.0038824",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "buy",
+  "fillPrice": "0.002439",
+  "tradeId": "1329752705560006661",
+  "baseVolume": "821.6",
+  "fillTime": "1752763671293",
+  "fillFee": "-0.8216",
+  "fillFeeCoin": "RIFSOL",
+  "tradeScope": "M",
+  "accBaseVolume": "821.6",
+  "priceAvg": "0.002439",
+  "status": "partially_filled",
+  "cTime": "1752762444778",
+  "uTime": "1752763671307",
+  "feeDetail": [
+    {
+      "feeCoin": "RIFSOL",
+      "fee": "-0.8216"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329747561184411649","clientOid":"orden-compra-1752762444569","price":"0.002439","size":"2.0038824","newSize":"821.6","notional":"2.0038824","orderType":"limit","force":"gtc","side":"buy","fillPrice":"0.002439","tradeId":"1329752705560006661","baseVolume":"821.6","fillTime":"1752763671293","fillFee":"-0.8216","fillFeeCoin":"RIFSOL","tradeScope":"M","accBaseVolume":"821.6","priceAvg":"0.002439","status":"partially_filled","cTime":"1752762444778","uTime":"1752763671307","feeDetail":[{"feeCoin":"RIFSOL","fee":"-0.8216"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752763671317}
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329747561184411649",
+      "clientOid": "orden-compra-1752762444569",
+      "price": "0.002439",
+      "size": "2.0038824",
+      "newSize": "821.6",
+      "notional": "2.0038824",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "buy",
+      "accBaseVolume": "821.6",
+      "priceAvg": "0.002439",
+      "status": "filled",
+      "cTime": "1752762444778",
+      "uTime": "1752763671307",
+      "feeDetail": [
+        {
+          "feeCoin": "RIFSOL",
+          "fee": "-0.8216"
+        }
+      ],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752763671319
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329747561184411649",
+  "clientOid": "orden-compra-1752762444569",
+  "price": "0.002439",
+  "size": "2.0038824",
+  "newSize": "821.6",
+  "notional": "2.0038824",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "buy",
+  "accBaseVolume": "821.6",
+  "priceAvg": "0.002439",
+  "status": "filled",
+  "cTime": "1752762444778",
+  "uTime": "1752763671307",
+  "feeDetail": [
+    {
+      "feeCoin": "RIFSOL",
+      "fee": "-0.8216"
+    }
+  ],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+✅ Orden COMPRA completada (buy): 1329747561184411649
+precio venta: 0.002448868448, cantidad comprada 821.6, fee: -0.8216, cantidad venta; 820.778400 
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329747561184411649","clientOid":"orden-compra-1752762444569","price":"0.002439","size":"2.0038824","newSize":"821.6","notional":"2.0038824","orderType":"limit","force":"gtc","side":"buy","accBaseVolume":"821.6","priceAvg":"0.002439","status":"filled","cTime":"1752762444778","uTime":"1752763671307","feeDetail":[{"feeCoin":"RIFSOL","fee":"-0.8216"}],"enterPointSource":"API","stpMode":"none"}],"ts":1752763671319}
+📤 Orden enviada: {"code":"00000","msg":"success","requestTime":1752763671847,"data":{"orderId":"1329752707893215234","clientOid":"orden-venta-1752763671493"}}
+📤 Orden de venta enviada: 1329752707893215234
+📥 Evento 'orders' recibido (raw): {
+  "action": "snapshot",
+  "arg": {
+    "instType": "SPOT",
+    "channel": "orders",
+    "instId": "RIFSOLUSDT"
+  },
+  "data": [
+    {
+      "instId": "RIFSOLUSDT",
+      "orderId": "1329752707893215234",
+      "clientOid": "orden-venta-1752763671493",
+      "price": "0.002449",
+      "size": "820.78",
+      "newSize": "820.78",
+      "orderType": "limit",
+      "force": "gtc",
+      "side": "sell",
+      "accBaseVolume": "0",
+      "priceAvg": "0",
+      "status": "live",
+      "cTime": "1752763671849",
+      "uTime": "1752763671849",
+      "feeDetail": [],
+      "enterPointSource": "API",
+      "stpMode": "none"
+    }
+  ],
+  "ts": 1752763671857
+}
+✅ --**--Evento Recibido--**--
+📦 Orden completa recibida:
+ {
+  "instId": "RIFSOLUSDT",
+  "orderId": "1329752707893215234",
+  "clientOid": "orden-venta-1752763671493",
+  "price": "0.002449",
+  "size": "820.78",
+  "newSize": "820.78",
+  "orderType": "limit",
+  "force": "gtc",
+  "side": "sell",
+  "accBaseVolume": "0",
+  "priceAvg": "0",
+  "status": "live",
+  "cTime": "1752763671849",
+  "uTime": "1752763671849",
+  "feeDetail": [],
+  "enterPointSource": "API",
+  "stpMode": "none"
+}
+📩 Mensaje recibido: {"action":"snapshot","arg":{"instType":"SPOT","channel":"orders","instId":"RIFSOLUSDT"},"data":[{"instId":"RIFSOLUSDT","orderId":"1329752707893215234","clientOid":"orden-venta-1752763671493","price":"0.002449","size":"820.78","newSize":"820.78","orderType":"limit","force":"gtc","side":"sell","accBaseVolume":"0","priceAvg":"0","status":"live","cTime":"1752763671849","uTime":"1752763671849","feeDetail":[],"enterPointSource":"API","stpMode":"none"}],"ts":1752763671857}

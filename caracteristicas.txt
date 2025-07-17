@@ -17,3 +17,15 @@ Ciclo completo de ejecución con lógica robusta (espera, cancelación si no se 
 /bots-activos: lista de bots con id, symbol y montoActual individual.
 
 /monto-actual-total: monto total acumulado de todos los bots.
+
+
+
+Siguiente paso sugerido:
+
+Ahora que todo el flujo se repite correctamente y actualiza el monto con la ganancia real (descontando el fee en USDT), podrías considerar:
+
+    Agregar un contador de ciclos para saber cuántos se han completado.
+
+    Mostrar el rendimiento acumulado desde el inicio.
+
+    O simplemente comenzar a hacer pruebas prolongadas.
