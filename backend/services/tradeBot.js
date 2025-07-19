@@ -22,7 +22,7 @@ const botsActivos = new Map();
 
 const wsClient = new WsClient('wss://ws.bitget.com/v2/ws/private', {
   receive: (data) => {
-    console.log('📩 Mensaje recibido:', data);
+    //console.log('📩 Mensaje recibido:', data);
   }
 });
 
@@ -81,7 +81,8 @@ wsClient.on('orderUpdate', async (order) => {
     faseActual = 'vendiendo';
     ordenActual.orderId = sellOrderId;
     ordenActual.sellPrice = sellPrice;
-    console.log(`📤 Orden de venta enviada: ${sellOrderId}`);
+    
+    console.log(`📤 Orden de VENTA puesta: ${sellOrderId}`);
 
   } else if (faseActual === 'vendiendo' && order.side === 'sell' && status === 'filled') {
       console.log(`✅ Orden VENTA completada (${order.side}): ${orderId}`);

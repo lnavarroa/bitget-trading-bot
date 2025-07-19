@@ -57,7 +57,7 @@ class WsClient extends EventEmitter {
 
         if (msg.arg?.channel === 'orders' && msg.data?.length > 0) {
           //console.log(`📥 Evento 'orders' recibido:`, data.toString());
-          console.log(`📥 Evento 'orders' recibido (raw):`, JSON.stringify(msg, null, 2));
+          //console.log(`📥 Evento 'orders' recibido (raw):`, JSON.stringify(msg, null, 2));
           this.emit('orderUpdate', msg.data[0]);
         }
 
