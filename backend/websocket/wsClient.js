@@ -1,136 +1,117 @@
 const WebSocket = require('ws');
 const { EventEmitter } = require('events');
-const { toJsonString } = require('bitget-api-node-sdk/build/lib/util');
-const { WsLoginReq } = require('bitget-api-node-sdk/build/lib/model/ws/WsLoginReq');
-const { SubscribeReq } = require('bitget-api-node-sdk/build/lib/model/ws/SubscribeReq');
-const { apiKey, apiSecret, passphrase } = require('../config/bitget');
 const crypto = require('crypto');
+require('dotenv').config();
 
 class WsClient extends EventEmitter {
-  constructor(wsUrl, listener) {
+  
+  constructor(wsUrl) {
     super();
-    this.wsUrl = wsUrl || 'wss://ws.bitget.com/v2/ws/public';
-    this.listener = listener;
+    this.wsUrl = wsUrl;
     this.socket = null;
     this.pingInterval = null;
+    this.reconnectTimeout = null;
     this.isConnecting = false;
     this.hasLoggedIn = false;
-    this.printedChannels = new Set();
+
+    this.apiKey = process.env.BITGET_API_KEY;
+    this.apiSecret = process.env.BITGET_API_SECRET;
+    this.passphrase = process.env.BITGET_PASSPHRASE;
+
+    // ✅ NUEVO: memoria de suscripciones
+    this.subscriptions = [];
   }
 
+
+  
   connect(auth = false) {
-    if (this.socket?.readyState === WebSocket.OPEN || this.isConnecting) {
-      console.log('⚠️ WebSocket ya conectado o en proceso de conexión.');
-      return;
-    }
+    if (this.socket?.readyState === WebSocket.OPEN || this.isConnecting) return;
 
     this.isConnecting = true;
     this.socket = new WebSocket(this.wsUrl);
-  
+
     this.socket.on('open', () => {
-      console.info(`✅ WebSocket conectado: ${this.wsUrl}`);
       this.isConnecting = false;
-      if (auth && !this.hasLoggedIn && this.wsUrl.includes('/ws/private')) {
-        this.login();
-      }
       this.startPing();
-      this.emit('open');
+      auth ? this.login() : this.emit('open');
     });
-  
+
     this.socket.on('message', (data) => {
-      if (data.toString() === 'pong') return;
+      
+    const text = data.toString();
+
+      // ✅ IGNORAR PING / PONG
+      if (text === 'pong' || text === 'ping') {
+        return;
+      }
+
+      let msg;
       try {
-        const msg = JSON.parse(data.toString());
-
-        if (msg.arg?.channel && !this.printedChannels.has(msg.arg.channel)) {
-          this.printedChannels.add(msg.arg.channel);
-          console.log(`📥 Primer mensaje del canal '${msg.arg.channel}':`, data.toString());
-        }
-
-        if (msg.event === 'login' && msg.code === 0) {
-          console.log('✅ Autenticación exitosa en el WebSocket privado.');
-          this.hasLoggedIn = true;
-          this.emit('login_success');
-        } else if (msg.event === 'error') {
-          console.error(`❌ Error en autenticación: ${msg.code} - ${msg.msg}`);
-        }
-
-        if (msg.arg?.channel === 'orders' && msg.data?.length > 0) {
-          //console.log(`📥 Evento 'orders' recibido:`, data.toString());
-          //console.log(`📥 Evento 'orders' recibido (raw):`, JSON.stringify(msg, null, 2));
-          this.emit('orderUpdate', msg.data[0]);
-        }
-
-        if (msg.event === 'subscribe' && msg.arg?.channel === 'orders') {
-          console.log(`📌 Suscripción confirmada al canal 'orders' para ${msg.arg.instId}`);
-        }
-
-      } catch (error) {
-        console.error('❌ Error al procesar mensaje:', error);
+        msg = JSON.parse(text);
+      } catch (err) {
+        console.warn('⚠️ WS mensaje no JSON ignorado:', text);
+        return;
       }
 
-      if (this.listener?.receive && typeof this.listener.receive === 'function') {
-        this.listener.receive(data.toString());
+      if (msg.event === 'login' && (msg.code === 0 || msg.code === '0')) {
+        this.hasLoggedIn = true;
+        this.emit('login_success');
+
+        // ✅ RE-SUSCRIPCIÓN AUTOMÁTICA
+        this.subscriptions.forEach(sub => {
+          this.send(sub);
+        });
       }
-      this.emit('message', data.toString());
+
+      if (msg.arg?.channel) {
+        this.emit(`channel:${msg.arg.channel}`, msg);
+      }
     });
-  
+
     this.socket.on('close', () => {
-      console.warn('❌ WebSocket cerrado');
-      this.stopPing();
       this.hasLoggedIn = false;
-      this.isConnecting = false;
-
-      // 🔁 Reintentar conexión SOLO si es WebSocket privado
-      if (this.wsUrl.includes('/ws/private')) {
-        setTimeout(() => this.connect(true), 5000);
-      }
-
-      this.emit('close');
-    });
-  
-    this.socket.on('error', (error) => {
-      console.error('❌ Error en WebSocket:', error);
-      this.emit('error', error);
+      this.stopPing();
+      this.reconnectTimeout = setTimeout(() => this.connect(auth), 5000);
     });
   }
+
 
   login() {
+    // Bitget V2 requiere timestamp en segundos para el Login WS
     const timestamp = Math.floor(Date.now() / 1000).toString();
-    const preHash = timestamp + 'GET' + '/user/verify';
-    const sign = crypto.createHmac('sha256', apiSecret).update(preHash).digest('base64');
+    const method = 'GET';
+    const path = '/user/verify';
+    
+    const preHash = timestamp + method + path;
+    const sign = crypto
+      .createHmac('sha256', this.apiSecret)
+      .update(preHash)
+      .digest('base64');
 
-    const loginReq = new WsLoginReq(apiKey, passphrase, timestamp, sign);
-    const msg = {
+    const loginMsg = {
       op: 'login',
-      args: [loginReq]
+      args: [{
+        apiKey: this.apiKey,
+        passphrase: this.passphrase,
+        timestamp: timestamp,
+        sign: sign
+      }]
     };
 
-    console.log('🔒 Intentando autenticación en el WebSocket privado...');
-    this.send(msg);
+    console.log('🔒 Enviando credenciales de autenticación...');
+    this.send(loginMsg);
   }
 
-  send(msgObj) {
-    if (this.socket?.readyState === WebSocket.OPEN) {
-      const msg = toJsonString(msgObj);
-      this.socket.send(msg);
-    } else {
-      console.warn('⚠️ No se puede enviar el mensaje, WebSocket no está conectado');
+  // Método genérico para enviar objetos JSON
+
+  send(data) {
+    const msg = typeof data === 'string' ? data : JSON.stringify(data);
+    if (!this.subscriptions.includes(msg) && msg.includes('"op":"subscribe"')) {
+      this.subscriptions.push(msg);
     }
+    this.socket?.readyState === 1 && this.socket.send(msg);
   }
 
-  subscribe(subs = []) {
-    const subReq = {
-      op: 'subscribe',
-      args: subs.map(sub => ({
-        instType: sub.instType,
-        channel: sub.channel,
-        instId: sub.instId || 'default'
-      }))
-    };
-    console.log(`📤 Enviando solicitud de suscripción: ${JSON.stringify(subReq)}`);
-    this.send(subReq);
-  }
 
   startPing() {
     this.stopPing();
@@ -138,45 +119,12 @@ class WsClient extends EventEmitter {
       if (this.socket?.readyState === WebSocket.OPEN) {
         this.socket.send('ping');
       }
-    }, 5000);
+    }, 25000); // 25s para estar dentro del límite de 30s de Bitget
   }
 
   stopPing() {
-    if (this.pingInterval) {
-      clearInterval(this.pingInterval);
-      this.pingInterval = null;
-    }
-  }
-
-  close() {
-    this.stopPing();
-    if (this.socket?.readyState === WebSocket.OPEN) {
-      this.socket.close();
-    }
-
-    // ❗ IMPORTANTE: Evita reconectar si es WebSocket público
-    if (this.wsUrl.includes('/ws/public')) {
-      this.socket = null; // evitar reintento automático externo
-      this.isConnecting = false;
-    }
+    if (this.pingInterval) clearInterval(this.pingInterval);
   }
 }
 
-function initWsPrivate(symbol, listener) {
-  const client = new WsClient('wss://ws.bitget.com/v2/ws/private', listener);
-
-  client.on('login_success', () => {
-    client.subscribe([
-      new SubscribeReq('SPOT', 'orders', symbol)
-    ]);
-  });
-
-  client.connect(true);
-  return client;
-}
-
-module.exports = {
-  WsClient,
-  initWsPrivate,
-  SubscribeReq,
-};
+module.exports = { WsClient };

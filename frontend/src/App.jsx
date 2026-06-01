@@ -3,279 +3,231 @@ import './App.css';
 
 function App() {
   const [view, setView] = useState('nuevo');
-  const [symbol, setSymbol] = useState('RIFSOLUSDT');
+  const [symbol, setSymbol] = useState('BTCUSDT');
   const [amount, setAmount] = useState(2);
   const [profitMargin, setProfitMargin] = useState(0.004);
   const [entryDiscount, setEntryDiscount] = useState(0.002);
   const [response, setResponse] = useState(null);
-  const [botActivo, setBotActivo] = useState(false);
-  const [montoActual, setMontoActual] = useState(null);
   const [botsActivos, setBotsActivos] = useState([]);
   const [montoTotal, setMontoTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [saldoUSDT, setSaldoUSDT] = useState(0);
   const [pairs, setPairs] = useState([]);
-  const filteredPairs = pairs.filter(p => p.symbol.includes(searchTerm));
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [topPrices, setTopPrices] = useState({ BTCUSDT: '...', ETHUSDT: '...', SOLUSDT: '...' });
 
-  const API_TOKEN = 'mi-token-seguro';
+  const API_TOKEN = 'mi-token-seguro'; // Debe coincidir con tu .env del backend
 
-  const fetchBalance = async () => {
+  // --- UTILIDADES ---
+  const calcularTiempo = (fechaInicio) => {
+    if (!fechaInicio) return "Iniciando...";
+    const inicio = new Date(fechaInicio);
+    const diff = Math.abs(new Date() - inicio);
+    const horas = Math.floor(diff / (1000 * 60 * 60));
+    const minutos = Math.floor((diff / (1000 * 60)) % 60);
+    return `${horas}h ${minutos}m`;
+  };
+
+  /* --- PETICIONES API (CON LOGS DE DEBUG) --- */
+
+  const fetchData = async (endpoint, setter, label) => {
     try {
-      const res = await fetch('http://localhost:3001/balance', {
-        headers: { Authorization: API_TOKEN }
+      const res = await fetch(`http://localhost:3001${endpoint}`, {
+        headers: { 'Authorization': API_TOKEN }
       });
       const data = await res.json();
-      setSaldoUSDT(data.balance);
+      if (data.error) throw new Error(data.error);
+      setter(data);
+      // console.log(`[DEBUG] ${label} cargado:`, data);
     } catch (err) {
-      console.error('Error al obtener el balance:', err);
+      console.error(`[ERROR] Falló fetch ${label}:`, err.message);
     }
   };
 
+  const fetchTodo = () => {
+    // Especial para balance ya que la estructura del JSON es {balance: X}
+    fetch('http://localhost:3001/balance', { headers: { 'Authorization': API_TOKEN } })
+      .then(r => r.json()).then(d => setSaldoUSDT(d.balance || 0));
+    
+    fetch('http://localhost:3001/bots-activos', { headers: { 'Authorization': API_TOKEN } })
+      .then(r => r.json()).then(d => setBotsActivos(d.bots || []));
+
+    fetch('http://localhost:3001/monto-actual-total', { headers: { 'Authorization': API_TOKEN } })
+      .then(r => r.json()).then(d => setMontoTotal(d.montoActualTotal || 0));
+
+    fetch('http://localhost:3001/top-prices', { headers: { 'Authorization': API_TOKEN } })
+      .then(r => r.json()).then(d => setTopPrices(d));
+  };
+
+  /* --- ACCIONES --- */
+
   const handleStartBot = async () => {
-    if (!symbol || !amount || !profitMargin || !entryDiscount) {
-      setResponse('Por favor, completa todos los campos antes de iniciar el bot.');
-      return;
-    }
-    if (amount <= 0 || profitMargin <= 0 || entryDiscount <= 0) {
-      setResponse('Los valores deben ser positivos.');
+    console.log(`🚀 Intentando lanzar bot: ${symbol} con ${amount} USDT`);
+    if (!symbol || amount <= 0) {
+      setResponse('Monto inválido o par no seleccionado.');
       return;
     }
 
     try {
       const res = await fetch('http://localhost:3001/start-bot', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: API_TOKEN
-        },
-        body: JSON.stringify({
-          symbol,
-          amount,
-          profitMargin,
-          entryDiscountPercentage: entryDiscount
+        headers: { 'Content-Type': 'application/json', 'Authorization': API_TOKEN },
+        body: JSON.stringify({ 
+          symbol, 
+          amount, 
+          profitMargin, 
+          entryDiscountPercentage: entryDiscount 
         })
       });
       const data = await res.json();
-      setResponse(data.message || 'Bot ejecutado');
-      if (data.id) setResponse(`Bot iniciado con ID: ${data.id}`);
-      setBotActivo(true);
-      fetchBotsActivos();
+      console.log("[RESPUESTA BACKEND]:", data);
+      setResponse(data.id ? `✅ Bot ${data.id} iniciado correctamente.` : data.message);
+      fetchTodo();
     } catch (err) {
-      console.error('Error al iniciar el bot:', err);
-      setResponse('Error al iniciar el bot.');
+      setResponse('❌ Error de conexión con el servidor.');
     }
   };
 
   const handleStopBot = async (id) => {
-    const confirm = window.confirm('¿Estás seguro de que deseas detener este bot?');
-    if (!confirm) return;
-
+    if (!window.confirm(`¿Detener bot ${id}?`)) return;
+    console.log(`🛑 Deteniendo bot ID: ${id}`);
     try {
-      const res = await fetch('http://localhost:3001/stop-bot', {
+      await fetch('http://localhost:3001/stop-bot', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: API_TOKEN
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': API_TOKEN },
         body: JSON.stringify({ id })
       });
-      const data = await res.json();
-      setResponse(data.message || 'Bot detenido');
-      fetchBotsActivos();
-    } catch (err) {
-      console.error('Error al detener el bot:', err);
-      setResponse('Error al detener el bot.');
-    }
-  };
-
-  const fetchBotsActivos = async () => {
-    try {
-      const res = await fetch('http://localhost:3001/bots-activos', {
-        headers: { Authorization: API_TOKEN }
-      });
-      const data = await res.json();
-      setBotsActivos(data.bots);
-    } catch (err) {
-      console.error('Error al obtener bots activos:', err);
-    }
-  };
-
-  const fetchMontoTotal = async () => {
-    try {
-      const res = await fetch('http://localhost:3001/monto-actual-total', {
-        headers: { Authorization: API_TOKEN }
-      });
-      const data = await res.json();
-      setMontoTotal(data.montoActualTotal);
-    } catch (err) {
-      console.error('Error al obtener monto total:', err);
-    }
-  };
-
-  const fetchPairs = async () => {
-    try {
-      const res = await fetch('http://localhost:3001/pairs', {
-        headers: { Authorization: API_TOKEN }
-      });
-      const json = await res.json();
-      if (Array.isArray(json.pairs)) {
-        setPairs(json.pairs);
-        if (json.pairs.length > 0 && !symbol) {
-          setSymbol(json.pairs[0].symbol);
-        }
-      } else {
-        console.error('Respuesta inválida del backend /pairs:', json);
-      }
-    } catch (err) {
-      console.error('Error al obtener pares:', err);
-    }
+      fetchTodo();
+    } catch (err) { console.error('Error al detener:', err); }
   };
 
   useEffect(() => {
-    fetchBotsActivos();
-    fetchMontoTotal();
-    fetchBalance();
-    fetchPairs();
-    const interval = setInterval(() => {
-      fetchBotsActivos();
-      fetchMontoTotal();
-      fetchBalance();
-    }, 5000);
+    // Carga inicial de pares
+    fetch('http://localhost:3001/pairs', { headers: { 'Authorization': API_TOKEN } })
+      .then(r => r.json()).then(d => setPairs(d.pairs || []));
+
+    fetchTodo();
+    const interval = setInterval(fetchTodo, 5000);
     return () => clearInterval(interval);
   }, []);
 
+  const filteredPairs = pairs.filter(p => p.symbol.includes(searchTerm));
+
   return (
     <div className="container-fluid px-0">
-      <nav className="navbar fixed-top d-flex justify-content-between align-items-center px-3">
-        <span className="navbar-brand mb-0 h4 text-light">
-          ⚙️ Panel de Control - Bitget Bot
-        </span>
-        {/* Mostrar solo en móvil */}
-        <button
-          className="btn btn-outline-light d-md-none"
-          onClick={() => setSidebarVisible(prev => !prev)}
-        >
-          ☰
-        </button>
+      {/* NAVBAR */}
+      <nav className="navbar fixed-top px-3 shadow-sm d-flex justify-content-between align-items-center">
+        <span className="navbar-brand mb-0 h4 text-primary-neon fw-bold">⚙️ BITGET BOT v2</span>
+        <div className="d-flex align-items-center">
+          <span className="badge bg-dark border border-success text-success me-2 d-none d-md-inline">SISTEMA ONLINE</span>
+          <button className="btn btn-outline-light d-md-none" onClick={() => setSidebarVisible(!sidebarVisible)}>☰</button>
+        </div>
       </nav>
 
-
-      <div className="row g-0" style={{ paddingTop: '56px' }}>
-        {/* Sidebar */}
-        <div className={`col-12 col-md-3 sidebar-custom ${sidebarVisible ? 'd-block' : 'd-none'} d-md-block`}>
-          <div className="p-3">
-            <h4>Menú</h4>
-            <button className="btn btn-outline-primary w-100 mb-2" onClick={() => setView('nuevo')}>Nuevo Bot</button>
-            <button className="btn btn-outline-secondary w-100" onClick={() => setView('activos')}>Bots Activos</button>
+      <div className="row g-0" style={{ paddingTop: '60px' }}>
+        
+        {/* SIDEBAR */}
+        <div className={`col-12 col-md-3 sidebar-custom p-3 ${sidebarVisible ? 'd-block' : 'd-none'} d-md-block`}>
+          <h6 className="text-muted small text-uppercase mb-3 fw-bold">Navegación</h6>
+          <button className={`btn w-100 mb-2 text-start ${view === 'nuevo' ? 'btn-primary' : 'btn-outline-light'}`} onClick={() => setView('nuevo')}>➕ Nuevo Bot</button>
+          <button className={`btn w-100 text-start ${view === 'activos' ? 'btn-primary' : 'btn-outline-light'}`} onClick={() => setView('activos')}>🤖 Bots Activos</button>
+          
+          <div className="mt-5 p-3 rounded bg-dark border border-secondary">
+             <small className="text-muted d-block mb-1">RESUMEN</small>
+             <div className="small">Bots: <span className="text-primary-neon">{botsActivos.length}</span></div>
+             <div className="small">Monto: <span className="text-success-neon">{montoTotal.toFixed(2)} USDT</span></div>
           </div>
         </div>
 
-        {/* Panel principal */}
-        <div className="col-12 col-md-6">
-          <div className="p-4">
-            <span role="img" aria-label="dinero">💰</span>{' '}
-            <p className="saldo-destacado text-center"><strong>Saldo disponible:</strong> {Number(saldoUSDT || 0).toFixed(8)} USDT</p>
-
-            {response && <div className="alert alert-info">{response}</div>}
-
-            {view === 'nuevo' && (
-              <div className="card p-4">
-                <h5 className="mb-3">Configurar Nuevo Bot</h5>
-
-                <div className="mb-3">
-                  <label className="form-label">Buscar par:</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value.toUpperCase())}
-                    placeholder="Ej: BTC, CHEEMS..."
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Par de Trading:</label>
-                  <select className="form-select" value={symbol} onChange={e => setSymbol(e.target.value)}>
-                    {filteredPairs.map(p => (
-                      <option key={p.symbol} value={p.symbol}>{p.symbol}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Monto Inicial (USDT):</label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    value={amount}
-                    onChange={e => setAmount(parseFloat(e.target.value))}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">% de Ganancia (ej: 0.004 = 0.4%):</label>
-                  <input
-                    type="number"
-                    step="0.0001"
-                    className="form-control"
-                    value={profitMargin}
-                    onChange={e => setProfitMargin(parseFloat(e.target.value))}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">% de Descuento de Entrada (ej: 0.002 = 0.2%):</label>
-                  <input
-                    type="number"
-                    step="0.0001"
-                    className="form-control"
-                    value={entryDiscount}
-                    onChange={e => setEntryDiscount(parseFloat(e.target.value))}
-                  />
-                </div>
-
-                <button className="btn btn-primary" onClick={handleStartBot}>Iniciar Bot</button>
-              </div>
-            )}
-
-            {view === 'activos' && (
-              <div className="card p-4">
-                <h5 className="mb-3">Bots Activos</h5>
-                <p><strong>Monto Total Acumulado:</strong> {montoTotal.toFixed(6)} USDT</p>
-                <ul className="list-group">
-                  {botsActivos.map(bot => (
-                    <li key={bot.id} className="list-group-item d-flex justify-content-between align-items-center">
-                      <div>
-                        <strong>ID:</strong> {bot.id} | <strong>Par:</strong> {bot.symbol} | <strong>Monto:</strong> {bot.amount.toFixed(6)} USDT
-                      </div>
-                      <button className="btn btn-sm btn-danger" onClick={() => handleStopBot(bot.id)}>Detener</button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+        {/* CONTENIDO PRINCIPAL */}
+        <div className="col-12 col-md-6 p-4">
+          <div className="card p-3 mb-4 text-center border-0 shadow">
+            <span className="text-muted small text-uppercase fw-bold">Disponible Spot</span>
+            <h2 className="mb-0 fw-bold text-success-neon" style={{ fontFamily: 'monospace' }}>
+              {Number(saldoUSDT).toFixed(6)} <small style={{fontSize: '1rem'}}>USDT</small>
+            </h2>
           </div>
-        </div>
 
-        {/* Columna derecha - widgets */}
-        <div className="col-12 col-md-3">
-          <div className="d-flex flex-column gap-3 p-3">
-            <div className="card p-3">
-              <h6 className="text-muted mb-2">🧮 Precios destacados</h6>
-              <ul className="list-unstyled mb-0">
-                <li>BTC/USDT: <strong>$62,580</strong></li>
-                <li>ETH/USDT: <strong>$3,290</strong></li>
-                <li>SOL/USDT: <strong>$138.20</strong></li>
-              </ul>
+          {response && (
+            <div className="alert alert-info border-0 shadow-sm mb-4 alert-dismissible">
+              {response}
+              <button className="btn-close" onClick={() => setResponse(null)}></button>
             </div>
-            <div className="card p-3">
-              <h6 className="text-muted mb-2">💧 Pares con alta liquidez</h6>
-              <ul className="list-unstyled mb-0">
-                <li>BTC/USDT</li>
-                <li>ETH/USDT</li>
-                <li>OP/USDT</li>
-              </ul>
+          )}
+
+          {view === 'nuevo' && (
+            <div className="card p-4 shadow border-0">
+              <h5 className="mb-4 fw-bold">Configuración de Estrategia</h5>
+              <div className="mb-3">
+                <label className="form-label small fw-bold">1. Seleccionar Mercado</label>
+                <input type="text" className="form-control mb-2" placeholder="🔍 Filtrar par..." value={searchTerm} onChange={e => setSearchTerm(e.target.value.toUpperCase())} />
+                <select className="form-select" value={symbol} onChange={e => setSymbol(e.target.value)}>
+                  {filteredPairs.map(p => <option key={p.symbol} value={p.symbol}>{p.symbol}</option>)}
+                </select>
+              </div>
+              <div className="row g-3">
+                <div className="col-12">
+                  <label className="form-label small fw-bold">2. Inversión (USDT)</label>
+                  <input type="number" className="form-control form-control-lg" value={amount} onChange={e => setAmount(parseFloat(e.target.value))} />
+                </div>
+                <div className="col-6">
+                  <label className="form-label small fw-bold">% Profit Objetivo</label>
+                  <input type="number" step="0.0001" className="form-control" value={profitMargin} onChange={e => setProfitMargin(parseFloat(e.target.value))} />
+                </div>
+                <div className="col-6">
+                  <label className="form-label small fw-bold">% Descuento Entrada</label>
+                  <input type="number" step="0.0001" className="form-control" value={entryDiscount} onChange={e => setEntryDiscount(parseFloat(e.target.value))} />
+                </div>
+              </div>
+              <button className="btn btn-primary btn-lg w-100 mt-4 fw-bold shadow" onClick={handleStartBot}>🚀 LANZAR BOT</button>
+            </div>
+          )}
+
+          {view === 'activos' && (
+            <div className="card p-4 shadow border-0">
+              <h5 className="mb-4 fw-bold">Monitoreo en Tiempo Real</h5>
+              {botsActivos.length === 0 ? <p className="text-muted text-center py-4">No hay operaciones activas.</p> : (
+                <div className="list-group list-group-flush">
+                  {botsActivos.map(bot => {
+                    const bId = bot.botId || bot.id;
+                    const bAmount = bot.amount || bot.stats?.saldoTotalActual || 0;
+                    return (
+                      <div key={bId} className="list-group-item p-3 mb-3 border rounded shadow-sm">
+                        <div className="d-flex justify-content-between align-items-center">
+                          <h6 className="mb-0 fw-bold text-primary-neon">{bot.symbol || bot.config?.symbol}</h6>
+                          <span className="badge bg-dark border border-warning text-warning">{bot.estadoActual?.fase?.toUpperCase() || 'TRADING'}</span>
+                        </div>
+                        <div className="row g-0 my-3 text-center bg-dark rounded p-2">
+                          <div className="col-4 border-end border-secondary"><small className="text-muted d-block">HORA</small><span className="small">{calcularTiempo(bot.stats?.fechaInicio)}</span></div>
+                          <div className="col-4 border-end border-secondary"><small className="text-muted d-block">CICLOS</small><span className="small text-info">{bot.stats?.ciclosCompletados || 0}</span></div>
+                          <div className="col-4"><small className="text-muted d-block">SALDO</small><span className="small text-success">{bAmount.toFixed(4)}</span></div>
+                        </div>
+                        <div className="d-flex justify-content-end">
+                           <button className="btn btn-sm btn-danger" onClick={() => handleStopBot(bId)}>DETENER</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* TICKERS LATERALES */}
+        <div className="col-12 col-md-3 p-3 d-none d-md-block">
+          <div className="card p-3 border-0 shadow-sm mb-3">
+            <h6 className="text-muted small fw-bold mb-3">TICKERS EN VIVO</h6>
+            <div className="d-flex justify-content-between mb-2"><span>BTC</span><span className="text-warning fw-bold">${topPrices.BTCUSDT}</span></div>
+            <div className="d-flex justify-content-between mb-2"><span>ETH</span><span className="text-info fw-bold">${topPrices.ETHUSDT}</span></div>
+            <div className="d-flex justify-content-between"><span>SOL</span><span className="text-success-neon fw-bold">${topPrices.SOLUSDT}</span></div>
+          </div>
+          <div className="card p-3 border-0 shadow-sm">
+            <h6 className="text-muted small fw-bold mb-2">QUICK ACCESS</h6>
+            <div className="d-flex flex-wrap gap-2">
+              {['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'PEPEUSDT'].map(p => (
+                <span key={p} className="badge bg-dark border border-secondary pointer p-2" onClick={() => setSymbol(p)}>{p}</span>
+              ))}
             </div>
           </div>
         </div>

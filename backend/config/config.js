@@ -1,4 +1,7 @@
-export const API_CONFIG = {
+// Cambiamos 'export const' por 'module.exports'
+const API_CONFIG = {
     API_URL: 'https://api.bitget.com',
     WS_URL: 'wss://ws.bitget.com/v2/ws/public'
 };
+
+module.exports = { API_CONFIG };
