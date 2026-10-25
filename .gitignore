@@ -6,6 +6,10 @@
 # Backend
 /backend/node_modules/
 /backend/package-lock.json
+/backend/logs
+/backend/dist
+/backend/.env
+/backend/.env.local
 
 # Frontend
 /frontend/node_modules/
@@ -20,3 +24,11 @@ dist
 github-token.txt
 APIKEY
 
+backend/capturas_terminal/
+backend/channel-examples-pc.txt
+backend/testing/
+estructura-base-proyecto.txt
+tareas mejora.txt
+test_11-04-2026.txt
+token-github.txt
+backend/logs/
