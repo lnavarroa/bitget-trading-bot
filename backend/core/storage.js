@@ -3,54 +3,59 @@ const path = require('path');
 
 const LOGS_DIR = path.join(__dirname, '../logs');
 
-// Asegurar que la carpeta existe
-if (!fs.existsSync(LOGS_DIR)) {
-    fs.mkdirSync(LOGS_DIR, { recursive: true });
+/**
+ * Almacén de sesiones por tipo de bot ('spot' | 'futures').
+ * Guarda en logs/<tipo>/sessions/bot_<id>.json
+ */
+function crearStorage(tipo) {
+  const dir = path.join(LOGS_DIR, tipo, 'sessions');
+  fs.mkdirSync(dir, { recursive: true });
+
+  const rutaSesion = (botId) => path.join(dir, `bot_${botId}.json`);
+
+  return {
+    saveBotSession(botId, data) {
+      try {
+        fs.writeFileSync(rutaSesion(botId), JSON.stringify(data, null, 2));
+      } catch (err) {
+        console.error(`❌ Error guardando sesión ${botId}:`, err.message);
+      }
+    },
+
+    getBotSession(botId) {
+      const ruta = rutaSesion(botId);
+      if (!fs.existsSync(ruta)) return null;
+      try {
+        return JSON.parse(fs.readFileSync(ruta, 'utf-8'));
+      } catch (err) {
+        console.error(`❌ Error leyendo sesión ${botId}:`, err.message);
+        return null;
+      }
+    },
+
+    getAllSessions() {
+      try {
+        return fs.readdirSync(dir)
+          .filter(f => f.endsWith('.json'))
+          .map(f => {
+            try {
+              return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8'));
+            } catch (err) {
+              console.error(`❌ Sesión ilegible (${f}):`, err.message);
+              return null;
+            }
+          })
+          .filter(Boolean);
+      } catch {
+        return [];
+      }
+    },
+
+    deleteBotSession(botId) {
+      const ruta = rutaSesion(botId);
+      if (fs.existsSync(ruta)) fs.unlinkSync(ruta);
+    }
+  };
 }
 
-const Storage = {
-  // Guarda el estado actual (Fase, OrdenID, Saldo)
-  saveBotSession: (botId, data) => {
-    const filePath = path.join(LOGS_DIR, `bot_${botId}.json`);
-    try {
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-    } catch (err) {
-        console.error(`❌ Error guardando sesión ${botId}:`, err.message);
-    }
-  },
-
-  // ALIAS: Cambiamos loadBotSession por getBotSession para que coincida con el bot
-  getBotSession: (botId) => {
-    const filePath = path.join(LOGS_DIR, `bot_${botId}.json`);
-    if (fs.existsSync(filePath)) {
-      try {
-        const content = fs.readFileSync(filePath, 'utf-8');
-        return JSON.parse(content);
-      } catch (err) {
-          console.error(`❌ Error leyendo sesión ${botId}:`, err.message);
-          return null;
-      }
-    }
-    return null;
-  },
-
-  getAllSessions: () => {
-    try {
-        const files = fs.readdirSync(LOGS_DIR).filter(f => f.endsWith('.json'));
-        return files.map(f => {
-            const content = fs.readFileSync(path.join(LOGS_DIR, f), 'utf-8');
-            return JSON.parse(content);
-        });
-    } catch (err) {
-        return [];
-    }
-  },
-
-  // Opcional: Limpiar sesión al terminar (para que no intente recuperar algo viejo)
-  deleteBotSession: (botId) => {
-    const filePath = path.join(LOGS_DIR, `bot_${botId}.json`);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  }
-};
-
-module.exports = Storage;
+module.exports = { crearStorage };

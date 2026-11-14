@@ -5,7 +5,7 @@ const { initSpotLog, logSpotTrade } = require('./tradeLogger');
 const OrderChannel = require('./channels/order');
 const AccountChannel = require('./channels/account');
 const FillChannel = require('./channels/fill');
-const Storage = require('../core/storage');
+const Storage = require('../core/storage').crearStorage('spot');
 
 const BUY_TIMEOUT_MS = 30 * 60 * 1000;
 const RESTART_DELAY_MS = 10_000;
@@ -483,6 +483,7 @@ async function ejecutarTradeLoop(config, botId) {
 
 function detenerBot(botId) {
   botsActivos.delete(botId);
+  Storage.deleteBotSession(botId);
 }
 
 function getMontoActualTotal() {
