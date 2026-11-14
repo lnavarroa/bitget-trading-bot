@@ -231,7 +231,7 @@ async function finalizarVenta(order, botId) {
    EVENTOS WS
 ========================= */
 
-wsPrivate.on('ORDER_FILLED', async (order) => {
+wsPrivate.on('spot:ORDER_FILLED', async (order) => {
   for (const [botId, bot] of botsActivos.entries()) {
     if (order.orderId !== bot.estado.ordenActual?.orderId) continue;
 
@@ -249,7 +249,7 @@ wsPrivate.on('ORDER_FILLED', async (order) => {
   }
 });
 
-wsPrivate.on('TRADE_FILLED', (trade) => {
+wsPrivate.on('spot:TRADE_FILLED', (trade) => {
   for (const [botId, bot] of botsActivos.entries()) {
     const orden = bot.estado.ordenActual;
     if (!orden) continue;

@@ -10,7 +10,7 @@ class OrderChannel {
         this.instType = 'SPOT';
 
         // Escuchar el evento específico del distribuidor modular
-        this.ws.on(`channel:${this.channel}`, (msg) => this.handleMessage(msg));
+        this.ws.on(`channel:${this.instType}:${this.channel}`, (msg) => this.handleMessage(msg));
     }
 
     /**
@@ -56,12 +56,12 @@ class OrderChannel {
             this._logStatus(orderUpdate);
 
             // Emitimos eventos específicos según el estado para facilitar la lógica del TradeBot
-            this.ws.emit('ORDER_UPDATE', orderUpdate);
+            this.ws.emit('spot:ORDER_UPDATE', orderUpdate);
 
             if (orderUpdate.status === 'filled') {
-                this.ws.emit('ORDER_FILLED', orderUpdate);
+                this.ws.emit('spot:ORDER_FILLED', orderUpdate);
             } else if (orderUpdate.status === 'cancelled') {
-                this.ws.emit('ORDER_CANCELLED', orderUpdate);
+                this.ws.emit('spot:ORDER_CANCELLED', orderUpdate);
             }
         });
     }

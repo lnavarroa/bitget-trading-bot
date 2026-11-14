@@ -63,8 +63,19 @@ class WsClient extends EventEmitter {
         });
       }
 
-      if (msg.arg?.channel) {
-        this.emit(`channel:${msg.arg.channel}`, msg);
+            if (msg.event === 'error') {
+        console.error('❌ WS error:', JSON.stringify(msg));
+      }
+
+      // Datos y confirmaciones: arg es un objeto { instType, channel, instId }
+      if (msg.arg && !Array.isArray(msg.arg) && msg.arg.channel) {
+        const { instType, channel } = msg.arg;
+        this.emit(`channel:${instType}:${channel}`, msg);
+      }
+
+      // Respuestas a órdenes enviadas por WebSocket: arg llega como lista
+      if (msg.event === 'trade' && Array.isArray(msg.arg)) {
+        this.emit('trade_response', msg);
       }
     });
 

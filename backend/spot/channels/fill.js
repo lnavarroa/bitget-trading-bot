@@ -10,7 +10,7 @@ class FillChannel {
         this.instType = 'SPOT';
 
         // Escuchar el evento específico que emite el Distribuidor en wsClient.js
-        this.ws.on(`channel:${this.channel}`, (msg) => this.handleMessage(msg));
+        this.ws.on(`channel:${this.instType}:${this.channel}`, (msg) => this.handleMessage(msg));
     }
 
     /**
@@ -56,7 +56,7 @@ class FillChannel {
             };
 
             // Emitir evento para que el TradeBot lo capture
-            this.ws.emit('TRADE_FILLED', tradeDetail);
+            this.ws.emit('spot:TRADE_FILLED', tradeDetail);
             
             console.log(`✅ [FILL] Ejecución de ${tradeDetail.side}: ${tradeDetail.size} ${tradeDetail.symbol} a ${tradeDetail.priceAvg}`);
         });
