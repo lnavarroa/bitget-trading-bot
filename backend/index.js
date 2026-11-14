@@ -82,6 +82,45 @@ app.get('/pairs', async (req, res) => {
     }
 });
 
+
+
+
+/**
+ * @route GET /monto-actual-total
+ */
+app.get('/monto-actual-total', (req, res) => {
+    const total = tradeBot.getMontoActualTotal();
+    res.json({ montoActualTotal: total });
+});
+
+/**
+ * @route GET /top-prices
+ * Precios en tiempo real para el Dashboard
+ */
+app.get('/top-prices', async (req, res) => {
+    try {
+        const response = await bitgetApi.get('/api/v2/spot/market/tickers');
+        const targetSymbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'];
+        
+        if (response.data.code === '00000') {
+            const prices = {};
+            response.data.data
+                .filter(t => targetSymbols.includes(t.symbol))
+                .forEach(t => prices[t.symbol] = t.lastPr);
+            return res.json(prices);
+        }
+        res.status(400).json({ error: "Error capturando tickers" });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+/* 
+*******************************
+******|Encendido/Apagado|******
+*******************************
+*/
+
 /**
  * @route POST /start-bot
  * Lanza una nueva instancia del bot
@@ -140,35 +179,11 @@ app.get('/bots-activos', (req, res) => {
     res.json({ count: activos.length, bots: activos });
 });
 
-/**
- * @route GET /monto-actual-total
- */
-app.get('/monto-actual-total', (req, res) => {
-    const total = tradeBot.getMontoActualTotal();
-    res.json({ montoActualTotal: total });
-});
-
-/**
- * @route GET /top-prices
- * Precios en tiempo real para el Dashboard
- */
-app.get('/top-prices', async (req, res) => {
-    try {
-        const response = await bitgetApi.get('/api/v2/spot/market/tickers');
-        const targetSymbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT'];
-        
-        if (response.data.code === '00000') {
-            const prices = {};
-            response.data.data
-                .filter(t => targetSymbols.includes(t.symbol))
-                .forEach(t => prices[t.symbol] = t.lastPr);
-            return res.json(prices);
-        }
-        res.status(400).json({ error: "Error capturando tickers" });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
-});
+/* 
+*******************************
+******|Encendido/Apagado|******
+*******************************
+*/
 
 app.listen(PORT, async () => {
     console.log("========================================");

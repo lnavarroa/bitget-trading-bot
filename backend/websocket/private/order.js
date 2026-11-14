@@ -47,6 +47,8 @@ class OrderChannel {
                 avgPrice: parseFloat(order.priceAvg || 0),
                 size: parseFloat(order.size || 0),
                 accBaseVolume: parseFloat(order.accBaseVolume || 0),
+                // Comisiones del canal 'orders': [{ feeCoin, fee }] (fee viene negativo)
+                feeDetail: Array.isArray(order.feeDetail) ? order.feeDetail : [],
                 uTime: order.uTime
             };
 

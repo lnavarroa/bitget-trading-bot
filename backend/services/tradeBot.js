@@ -35,10 +35,39 @@ async function getPrecision(symbol) {
     const info = res.data.data[0];
     return {
       qty: Number(info.quantityPrecision),
-      price: Number(info.pricePrecision)
+      price: Number(info.pricePrecision),
+      minTradeUSDT: Number(info.minTradeUSDT)
     };
   } catch {
     return { qty: 6, price: 2 };
+  }
+}
+
+// Redondea hacia abajo (nunca hacia arriba) para no pedir más de lo que hay en cuenta
+function floorTo(value, decimals) {
+  const factor = Math.pow(10, decimals);
+  return Math.floor(value * factor + 1e-9) / factor;
+}
+
+// Comisión cobrada en la moneda base (se descuenta de lo comprado).
+// Ignora comisiones en USDT u otras monedas (p. ej. BGB).
+function feeEnMonedaBase(feeDetail, symbol) {
+  if (!Array.isArray(feeDetail)) return 0;
+  const baseCoin = symbol.endsWith('USDT') ? symbol.slice(0, -4) : null;
+  if (!baseCoin) return 0;
+  return feeDetail
+    .filter(f => f.feeCoin === baseCoin)
+    .reduce((acc, f) => acc + Math.abs(Number(f.fee ?? f.totalFee ?? 0)), 0);
+}
+
+// Saldo disponible de una moneda en Spot (null si no se pudo consultar)
+async function getDisponible(coin) {
+  try {
+    const res = await bitgetApi.get(`/api/v2/spot/account/assets?coin=${coin}`);
+    const item = res.data?.data?.find(a => a.coin === coin);
+    return item ? Number(item.available) : null;
+  } catch {
+    return null;
   }
 }
 
@@ -88,8 +117,26 @@ async function procesarCompra(order, botId) {
       bot.estado.ordenActual.entryPrice * (1 + profitMargin)
     ).toFixed(precision.price);
 
-    const qty = Number(order.accBaseVolume || order.size)
-      .toFixed(precision.qty);
+    // La comisión de compra se cobra en la moneda base: hay que descontarla de lo que se vende
+    const qtyComprada = Number(order.accBaseVolume || order.size);
+    const feeBase = feeEnMonedaBase(order.feeDetail, symbol);
+    let qtyVendible = qtyComprada - feeBase;
+
+    // Red de seguridad: nunca vender más de lo disponible en cuenta
+    const baseCoin = symbol.endsWith('USDT') ? symbol.slice(0, -4) : null;
+    const disponible = baseCoin ? await getDisponible(baseCoin) : null;
+    if (Number.isFinite(disponible) && disponible > 0 && disponible < qtyVendible) {
+      qtyVendible = disponible;
+    }
+
+    const qty = floorTo(qtyVendible, precision.qty).toFixed(precision.qty);
+    console.log(
+      `[BOT ${botId}] Venta: comprado ${qtyComprada}, comisión base ${feeBase}, disponible ${disponible}, a vender ${qty}`
+    );
+
+    if (!(Number(qty) > 0)) {
+      throw new Error(`Cantidad a vender inválida (${qty})`);
+    }
 
     logSpotTrade(botId, {
       tipo: 'compra',
@@ -188,10 +235,16 @@ wsPrivate.on('ORDER_FILLED', async (order) => {
   for (const [botId, bot] of botsActivos.entries()) {
     if (order.orderId !== bot.estado.ordenActual?.orderId) continue;
 
-    if (bot.estado.faseActual === 'comprando') {
-      await procesarCompra(order, botId);
-    } else if (bot.estado.faseActual === 'vendiendo') {
-      await finalizarVenta(order, botId);
+    try {
+      if (bot.estado.faseActual === 'comprando') {
+        await procesarCompra(order, botId);
+      } else if (bot.estado.faseActual === 'vendiendo') {
+        await finalizarVenta(order, botId);
+      }
+    } catch (e) {
+      // Evita que un error en un bot tumbe todo el proceso (rechazo sin capturar)
+      const detalle = e.response?.data ? JSON.stringify(e.response.data) : e.message;
+      console.error(`[BOT ${botId}] Error procesando ORDER_FILLED: ${detalle}`);
     }
   }
 });
@@ -292,7 +345,7 @@ setInterval(async () => {
    INICIO DE CICLO
 ========================= */
 
-async function iniciarCiclo(botId) {
+async function iniciarCicloInterno(botId) {
   const bot = botsActivos.get(botId);
   if (!bot || !bot.activo) return;
 
@@ -312,6 +365,21 @@ async function iniciarCiclo(botId) {
   const lastPrice = Number(ticker.data.data[0].lastPr);
 
   const precision = await getPrecision(symbol);
+
+  // Validaciones previas para no enviar órdenes que Bitget va a rechazar
+  if (Number.isFinite(precision.minTradeUSDT) && capital < precision.minTradeUSDT) {
+    throw new Error(
+      `Capital ${capital} USDT menor al mínimo del par ${symbol} (${precision.minTradeUSDT} USDT)`
+    );
+  }
+
+  const usdtDisponible = await getDisponible('USDT');
+  if (Number.isFinite(usdtDisponible) && usdtDisponible < capital) {
+    throw new Error(
+      `Saldo USDT insuficiente: disponible ${usdtDisponible}, requerido ${capital}`
+    );
+  }
+
   const entryPrice = (
     lastPrice * (1 - entryDiscountPercentage)
   ).toFixed(precision.price);
@@ -345,6 +413,23 @@ async function iniciarCiclo(botId) {
 /* =========================
    ENTRYPOINT
 ========================= */
+
+// Envuelve el ciclo para que un error (saldo, red, API) no genere un rechazo sin capturar
+// que termine el proceso. Ante un error el bot queda en fase 'error' y no reintenta solo.
+async function iniciarCiclo(botId) {
+  try {
+    await iniciarCicloInterno(botId);
+  } catch (e) {
+    const detalle = e.response?.data ? JSON.stringify(e.response.data) : e.message;
+    console.error(`[BOT ${botId}] No se pudo iniciar el ciclo: ${detalle}`);
+    const bot = botsActivos.get(botId);
+    if (bot) {
+      bot.estado.faseActual = 'error';
+      bot.estado.ordenActual = null;
+      actualizarSesion(botId);
+    }
+  }
+}
 
 async function ejecutarTradeLoop(config, botId) {
   initSpotLog({

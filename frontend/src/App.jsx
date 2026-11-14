@@ -28,6 +28,28 @@ function App() {
     return `${horas}h ${minutos}m`;
   };
 
+  // Fases del bot -> etiqueta y color del badge
+  const FASES = {
+    esperando: { label: 'ESPERANDO', clase: 'border-secondary text-secondary' },
+    comprando: { label: 'COMPRANDO', clase: 'border-info text-info' },
+    vendiendo: { label: 'VENDIENDO', clase: 'border-success text-success' },
+    error: { label: 'ERROR', clase: 'border-danger text-danger' }
+  };
+
+  // El backend devuelve el bot en memoria (configInicial / estado / stats).
+  // Se aceptan también los nombres antiguos (config / estadoActual) por compatibilidad.
+  const normalizarBot = (bot) => {
+    const config = bot.configInicial || bot.config || {};
+    const estado = bot.estado || bot.estadoActual || {};
+    return {
+      id: config.botId ?? bot.botId ?? bot.id,
+      symbol: config.symbol || bot.symbol || '—',
+      saldo: Number(estado.currentAmount ?? bot.amount ?? 0),
+      fase: estado.faseActual || estado.fase || null,
+      stats: bot.stats || {}
+    };
+  };
+
   /* --- PETICIONES API (CON LOGS DE DEBUG) --- */
 
   const fetchData = async (endpoint, setter, label) => {
@@ -188,20 +210,28 @@ function App() {
               <h5 className="mb-4 fw-bold">Monitoreo en Tiempo Real</h5>
               {botsActivos.length === 0 ? <p className="text-muted text-center py-4">No hay operaciones activas.</p> : (
                 <div className="list-group list-group-flush">
-                  {botsActivos.map(bot => {
-                    const bId = bot.botId || bot.id;
-                    const bAmount = bot.amount || bot.stats?.saldoTotalActual || 0;
+                  {botsActivos.map(rawBot => {
+                    const bot = normalizarBot(rawBot);
+                    const bId = bot.id;
+                    const bAmount = bot.saldo;
+                    const faseInfo = FASES[bot.fase] || {
+                      label: bot.fase ? bot.fase.toUpperCase() : 'DESCONOCIDO',
+                      clase: 'border-warning text-warning'
+                    };
                     return (
                       <div key={bId} className="list-group-item p-3 mb-3 border rounded shadow-sm">
                         <div className="d-flex justify-content-between align-items-center">
-                          <h6 className="mb-0 fw-bold text-primary-neon">{bot.symbol || bot.config?.symbol}</h6>
-                          <span className="badge bg-dark border border-warning text-warning">{bot.estadoActual?.fase?.toUpperCase() || 'TRADING'}</span>
+                          <h6 className="mb-0 fw-bold text-primary-neon">{bot.symbol}</h6>
+                          <span className={`badge bg-dark border ${faseInfo.clase}`}>{faseInfo.label}</span>
                         </div>
                         <div className="row g-0 my-3 text-center bg-dark rounded p-2">
                           <div className="col-4 border-end border-secondary"><small className="text-muted d-block">HORA</small><span className="small">{calcularTiempo(bot.stats?.fechaInicio)}</span></div>
                           <div className="col-4 border-end border-secondary"><small className="text-muted d-block">CICLOS</small><span className="small text-info">{bot.stats?.ciclosCompletados || 0}</span></div>
                           <div className="col-4"><small className="text-muted d-block">SALDO</small><span className="small text-success">{bAmount.toFixed(4)}</span></div>
                         </div>
+                        {bot.fase === 'error' && (
+                          <p className="small text-danger mb-2">El ciclo se detuvo por un error. Revisa el log del backend.</p>
+                        )}
                         <div className="d-flex justify-content-end">
                            <button className="btn btn-sm btn-danger" onClick={() => handleStopBot(bId)}>DETENER</button>
                         </div>
