@@ -1,11 +1,11 @@
-const { bitgetApi } = require('../config/client');
-const { API_CONFIG } = require('../config/config');
-const { WsClient } = require('../websocket/wsClient');
+const { bitgetApi } = require('../core/httpClient');
+const { API_CONFIG } = require('../core/config');
+const { WsClient } = require('../core/wsClient');
 const { initSpotLog, logSpotTrade } = require('./tradeLogger');
-const OrderChannel = require('../websocket/private/order');
-const AccountChannel = require('../websocket/private/account');
-const FillChannel = require('../websocket/private/fill');
-const Storage = require('./storage');
+const OrderChannel = require('./channels/order');
+const AccountChannel = require('./channels/account');
+const FillChannel = require('./channels/fill');
+const Storage = require('../core/storage');
 
 const BUY_TIMEOUT_MS = 30 * 60 * 1000;
 const RESTART_DELAY_MS = 10_000;

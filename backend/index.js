@@ -3,8 +3,8 @@ const cors = require('cors');
 require('dotenv').config();
 
 // Servicios y Configuración
-const tradeBot = require('./services/tradeBot');
-const { bitgetApi } = require('./config/client'); 
+const tradeBot = require('./spot/tradeBot');
+const { bitgetApi } = require('./core/httpClient'); 
 
 const app = express();
 const PORT = process.env.PORT || 3001;
