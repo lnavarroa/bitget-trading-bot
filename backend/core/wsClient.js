@@ -55,12 +55,13 @@ class WsClient extends EventEmitter {
 
       if (msg.event === 'login' && (msg.code === 0 || msg.code === '0')) {
         this.hasLoggedIn = true;
-        this.emit('login_success');
 
         // ✅ RE-SUSCRIPCIÓN AUTOMÁTICA
         this.subscriptions.forEach(sub => {
           this.send(sub);
         });
+
+        this.emit('login_success');
       }
 
             if (msg.event === 'error') {
