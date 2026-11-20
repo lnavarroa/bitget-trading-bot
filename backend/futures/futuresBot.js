@@ -14,6 +14,7 @@ const DEFAULTS = {
   dryRun: true,
   netoPct: 1,               // % neto sobre margen (incluye el apalancamiento)
   apalancamiento: 5,
+  factorApertura: 1,
   confirmoReal: false,
   slPct: 0.36,              // stop loss, % de precio
   margenMax: null,          // USDT de margen máximo (null = todo lo abrible)
@@ -136,14 +137,35 @@ function crearBot(userConfig) {
     const inferior = S.redondearAbajo(n.inferior, contrato.pricePlace, contrato.priceEndStep);
     const superior = S.redondearArriba(n.superior, contrato.pricePlace, contrato.priceEndStep);
 
-    const nominalPorPata = (margen / 2) * 0.95 * cfg.apalancamiento;
-    const { cantidad, cumpleMinimo } = S.calcularCantidad({
-      nominalUSDT: nominalPorPata,
-      precio: superior,
-      volumePlace: contrato.volumePlace,
-      sizeMultiplier: contrato.sizeMultiplier,
-      minTradeNum: contrato.minTradeNum
-    });
+    // Tamaño por pata = mitad de la apertura máxima que informa Bitget (la menor entre long y short)
+    let cantidad;
+    let cumpleMinimo;
+    try {
+      const [maxLong, maxShort] = await Promise.all([
+        api.getMaxOpen(cfg.symbol, 'long', inferior),
+        api.getMaxOpen(cfg.symbol, 'short', superior)
+      ]);
+      let maxBase = Math.min(maxLong, maxShort);
+      if (cfg.margenMax) {
+        // BTC que cabe en el margen máximo configurado (entre las dos patas)
+        maxBase = Math.min(maxBase, (cfg.margenMax * cfg.apalancamiento) / superior);
+      }
+      const mult = Number(contrato.sizeMultiplier);
+      const mitad = (maxBase * cfg.factorApertura) / 2;
+      cantidad = Number((Math.floor(mitad / mult + 1e-9) * mult).toFixed(Number(contrato.volumePlace)));
+      cumpleMinimo = cantidad >= Number(contrato.minTradeNum);
+      nota(`apertura máxima long ${maxLong} / short ${maxShort} -> ${cantidad} por pata`);
+    } catch (e) {
+      notaError(`max-open no disponible (${e.message}); uso el cálculo conservador`);
+      const nominalPorPata = (margen / 2) * 0.95 * cfg.apalancamiento;
+      ({ cantidad, cumpleMinimo } = S.calcularCantidad({
+        nominalUSDT: nominalPorPata,
+        precio: superior,
+        volumePlace: contrato.volumePlace,
+        sizeMultiplier: contrato.sizeMultiplier,
+        minTradeNum: contrato.minTradeNum
+      }));
+    }
     if (!cumpleMinimo || cantidad * superior < Number(contrato.minTradeUSDT)) {
       throw new Error(`Margen insuficiente: ${cantidad} por pata no cumple el mínimo del contrato`);
     }
@@ -281,6 +303,14 @@ function crearBot(userConfig) {
       catch (e) { notaError(`error en onFill: ${e.message}`); }
     });
     await feed.esperarCuenta();
+    const saldo = await leerSaldo();
+    if (saldo) {
+      estado.saldoInicial = saldo.total;
+      nota(`SALDO INICIAL FUTUROS: ${saldo.total.toFixed(4)} USDT (disponible ${saldo.disponible.toFixed(4)})`);
+      elog.log('saldo_inicial', saldo);
+    } else {
+      notaError('No pude leer el saldo inicial de futuros');
+    }
     estado.dia = dia();
     estado.fase = 'esperando';
     nota(`${cfg.dryRun ? 'SIMULACIÓN' : 'MODO REAL'} iniciado (maker ${ctx.feeMaker}, taker ${ctx.feeTaker})`);
@@ -324,8 +354,39 @@ function crearBot(userConfig) {
       netoTotalUSDT: Number(neto.toFixed(4)),
       netoPromPctMargen: n ? Number((t.reduce((s, x) => s + x.netoPctMargen, 0) / n).toFixed(3)) : null,
       porSalida,
-      pnlDiaUSDT: Number(estado.pnlDia.toFixed(4))
+      pnlDiaUSDT: Number(estado.pnlDia.toFixed(4)),
+      iniciado: Number.isFinite(Number(id)) ? new Date(Number(id)).toISOString() : null,
+      saldoInicialUSDT: estado.saldoInicial ?? null,
+      saldoFinalUSDT: estado.saldoFinal ?? null
     };
+  }
+
+  async function leerSaldo() {
+    let c = null;
+    let fuente = 'rest';
+    try {
+      c = await api.getAccount(cfg.symbol);
+    } catch (e) {
+      c = feed.getCuenta();
+      fuente = 'ws';
+    }
+    if (!c) return null;
+    const total = Number(c.usdtEquity ?? c.accountEquity ?? c.equity);
+    const disponible = Number(c.available);
+    if (!Number.isFinite(total)) return null;
+    return { total, disponible, fuente };
+  }
+
+  // Solo en real: en simulación el saldo de la cuenta no cambia
+  async function registrarSaldoFinal() {
+    if (cfg.dryRun) return;
+    const s = await leerSaldo();
+    if (!s) return;
+    estado.saldoFinal = s.total;
+    const dif = estado.saldoInicial != null ? s.total - estado.saldoInicial : null;
+    nota(`SALDO FINAL FUTUROS: ${s.total.toFixed(4)} USDT` +
+         (dif != null ? ` (${dif >= 0 ? '+' : ''}${dif.toFixed(4)} vs inicio)` : ''));
+    elog.log('saldo_final', { ...s, diferencia: dif });
   }
 
   function lineaResumen() {
@@ -342,7 +403,8 @@ function crearBot(userConfig) {
     resumen,
     guardarResumen: () => elog.resumen({ botId: id, symbol: cfg.symbol, config: cfg, ...resumen() }),
     archivos: { eventos: elog.archivoEventos, resumen: elog.archivoResumen },
-    estado: () => estado
+    estado: () => estado,
+    registrarSaldoFinal
   };
 }
 

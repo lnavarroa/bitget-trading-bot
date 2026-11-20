@@ -45,6 +45,7 @@ async function salir(motivo) {
   try {
     await bot.detener(motivo, { cerrarPosiciones: cerrarAlSalir });
     await new Promise((r) => setTimeout(r, 6000)); // deja llegar las confirmaciones finales
+    await bot.registrarSaldoFinal();
   } catch (e) {
     console.error('Error al cerrar:', e.message);
   }

@@ -30,6 +30,12 @@ const trades = ids
   .filter((t) => !modo || (t.modo || 'sim') === modo);
 const eventos = ids.flatMap((i) => leer(path.join(dirEventos, `bot_${i}_eventos.jsonl`)));
 
+const saldos = eventos.filter((e) => e.tipo === 'saldo_inicial' || e.tipo === 'saldo_final');
+if (saldos.length) {
+  console.log('\nSALDOS');
+  console.table(saldos.map((e) => ({ ts: e.ts, tipo: e.tipo, total: e.total, disponible: e.disponible, diferencia: e.diferencia ?? '' })));
+}
+
 if (!trades.length) {
   console.log('Aún no hay operaciones cerradas para ese bot.');
 }

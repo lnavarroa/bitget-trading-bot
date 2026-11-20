@@ -120,6 +120,23 @@ async function verificarCuenta(symbol) {
   return c;
 }
 
+async function getMaxOpen(symbol, posSide, openPrice) {
+  const qs = new URLSearchParams({
+    symbol,
+    productType: PRODUCT_TYPE,
+    marginCoin: MARGIN_COIN,
+    posSide,
+    orderType: 'limit',
+    openPrice: String(openPrice)
+  }).toString();
+  try {
+    const res = await bitgetApi.get(`/api/v2/mix/account/max-open?${qs}`);
+    return Number(datos(res).maxOpen);
+  } catch (e) {
+    throw errorBitget(e);
+  }
+}
+
 module.exports = {
   PRODUCT_TYPE,
   MARGIN_COIN,
@@ -132,5 +149,6 @@ module.exports = {
   colocarOrden,
   cancelarOrden,
   setLeverage,
-  verificarCuenta
+  verificarCuenta,
+  getMaxOpen
 };
