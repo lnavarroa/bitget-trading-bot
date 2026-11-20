@@ -6,6 +6,7 @@ const S = require('./strategy');
 const { SimExchange } = require('./simExchange');
 const { enVentana, minutosHastaCierre } = require('./schedule');
 const { crearEventLog } = require('./eventLog');
+const { RealExchange } = require('./realExchange');
 
 const TRADES_DIR = path.join(__dirname, '../logs/futures/trades');
 
@@ -13,6 +14,7 @@ const DEFAULTS = {
   dryRun: true,
   netoPct: 1,               // % neto sobre margen (incluye el apalancamiento)
   apalancamiento: 5,
+  confirmoReal: false,
   slPct: 0.36,              // stop loss, % de precio
   margenMax: null,          // USDT de margen máximo (null = todo lo abrible)
   ventana: { activa: false, desde: '22:00', hasta: '06:00', zona: 'America/Santiago' },
@@ -20,6 +22,7 @@ const DEFAULTS = {
   recentrarMin: 15,
   cierreForzadoMin: 15,
   maxPerdidaDiariaUSDT: 1,
+  maxCaidaMin: 30,
   intervaloMs: 1500,
   pausaEntreCiclosMs: 3000,
   slipTicks: 1
@@ -53,6 +56,8 @@ function crearBot(userConfig) {
     dia: null,
     ultimoCierre: 0,
     salioDeVentana: null,
+    pausaHasta: 0,
+    primerError: null,
     errores: 0,
     detenido: false,
     motivo: null
@@ -63,6 +68,7 @@ function crearBot(userConfig) {
   let sim = null;
   let timer = null;
   let ocupado = false;
+  let ticks = 0;
 
   const dia = () => new Intl.DateTimeFormat('en-CA', { timeZone: cfg.ventana.zona }).format(new Date());
 
@@ -70,7 +76,8 @@ function crearBot(userConfig) {
     const bruto = f.leg === 'long' ? (f.precio - f.entry) * f.size : (f.entry - f.precio) * f.size;
     const feeEntrada = f.entry * f.size * ctx.feeMaker;
     const feeSalida = f.precio * f.size * (f.tipo === 'tp' ? ctx.feeMaker : ctx.feeTaker);
-    const neto = bruto - feeEntrada - feeSalida;
+    const fees = Number.isFinite(f.fees) ? f.fees : feeEntrada + feeSalida;
+    const neto = bruto - fees;
     const margen = (f.entry * f.size) / cfg.apalancamiento;
     const trade = {
       hora: new Date().toISOString(),
@@ -90,6 +97,8 @@ function crearBot(userConfig) {
     fs.mkdirSync(TRADES_DIR, { recursive: true });
     fs.appendFileSync(path.join(TRADES_DIR, `bot_${id}.jsonl`), JSON.stringify(trade) + '\n');
     nota(`CIERRE ${trade.leg} por ${trade.salida}: ${trade.netoUSDT} USDT (${trade.netoPctMargen}% del margen)`);
+    nota(lineaResumen());
+    elog.resumen({ botId: id, symbol: cfg.symbol, config: cfg, ...resumen() });
   }
 
   function onFill(f) {
@@ -98,7 +107,7 @@ function crearBot(userConfig) {
       const otra = f.leg === 'long' ? 'short' : 'long';
       if (sim.tieneEntradaActiva(otra)) {
         sim.cancelarEntrada(otra);
-        nota(`entrada ${otra} cancelada`);
+          if (cfg.dryRun) nota(`entrada ${otra} cancelada`);
       }
       const tp = f.leg === 'long' ? estado.ciclo.superior : estado.ciclo.inferior;
       sim.colocarSalida(f.leg, tp);
@@ -142,10 +151,20 @@ function crearBot(userConfig) {
     const slLong = S.redondearAbajo(inferior * (1 - cfg.slPct / 100), contrato.pricePlace, contrato.priceEndStep);
     const slShort = S.redondearArriba(superior * (1 + cfg.slPct / 100), contrato.pricePlace, contrato.priceEndStep);
 
-    sim.colocarEntrada('long', inferior, cantidad, slLong);
-    sim.colocarEntrada('short', superior, cantidad, slShort);
     estado.ciclo = { precioRef: precio, inferior, superior, cantidad, inicio: Date.now(), mov };
     estado.fase = 'entradas';
+
+    try {
+      await Promise.all([
+        sim.colocarEntrada('long', inferior, cantidad, slLong),
+        sim.colocarEntrada('short', superior, cantidad, slShort)
+      ]);
+    } catch (e) {
+      await sim.cancelarEntrada('long');
+      await sim.cancelarEntrada('short');
+      throw e;
+    }
+    
     nota(
       `CICLO: long ${inferior} / short ${superior} (mov ${mov.toFixed(3)}%), ` +
       `${cantidad} por pata, SL ${slLong} / ${slShort}`
@@ -168,7 +187,7 @@ function crearBot(userConfig) {
       if (hayPos) {
         estado.salioDeVentana = estado.salioDeVentana || Date.now();
         if (Date.now() - estado.salioDeVentana > cfg.cierreForzadoMin * 60000) {
-          ['long', 'short'].forEach((l) => sim.cerrarAMercado(l));
+          await Promise.all(['long', 'short'].map((l) => sim.cerrarAMercado(l)));
         }
       } else {
         estado.fase = 'fuera_de_ventana';
@@ -203,6 +222,7 @@ function crearBot(userConfig) {
 
   async function latido() {
     if (ocupado || estado.detenido) return;
+    if (Date.now() < estado.pausaHasta) return; // espera tras un error
     ocupado = true;
     try {
       const t = await api.getTicker(cfg.symbol);
@@ -210,44 +230,81 @@ function crearBot(userConfig) {
       estado.precio = precio;
       sim.onPrecio(precio);
       await gestionar(precio);
+      ticks += 1;
+      if (!cfg.dryRun && ticks % 20 === 0) await sim.reconciliar();
+      if (estado.errores > 0) nota(`conexión recuperada tras ${estado.errores} errores`);
       estado.errores = 0;
+      estado.primerError = null;
     } catch (e) {
       estado.errores += 1;
+      if (!estado.primerError) estado.primerError = Date.now();
+      estado.pausaHasta = Date.now() + Math.min(30000, 1500 * 2 ** Math.min(estado.errores, 5));
       const detalle = e.response?.data ? JSON.stringify(e.response.data) : e.message;
-      notaError(`error (${estado.errores}): ${detalle}`);
-      if (estado.errores >= 20) detener('demasiados errores consecutivos');
+      if (estado.errores === 1 || estado.errores % 10 === 0) {
+        notaError(`error (${estado.errores}): ${detalle}`);
+      }
+      const caidaMin = (Date.now() - estado.primerError) / 60000;
+      if (caidaMin > cfg.maxCaidaMin) detener(`sin conexión por más de ${cfg.maxCaidaMin} min`);
     } finally {
       ocupado = false;
     }
   }
 
   async function iniciar() {
-    if (!cfg.dryRun) throw new Error('El modo real aún no está implementado: usa dryRun: true');
     contrato = await api.getContract(cfg.symbol);
     if (!contrato || contrato.symbolStatus !== 'normal') {
       throw new Error(`Contrato no operable: ${contrato?.symbolStatus}`);
     }
     ctx = { feeMaker: Number(contrato.makerFeeRate), feeTaker: Number(contrato.takerFeeRate) };
     const tick = S.paso(contrato.pricePlace, contrato.priceEndStep);
-    sim = new SimExchange({ tick, slipTicks: cfg.slipTicks });
-    sim.on('fill', onFill);
+        if (cfg.dryRun) {
+      sim = new SimExchange({ tick, slipTicks: cfg.slipTicks });
+    } else {
+      if (!cfg.confirmoReal) throw new Error('Modo real sin confirmación (confirmoReal)');
+      if (!(cfg.margenMax > 0)) throw new Error('En modo real debes definir un margen máximo (margenMax)');
+      const ws = feed.iniciar();
+      sim = new RealExchange({ ws, symbol: cfg.symbol, contrato, apalancamiento: cfg.apalancamiento, botId: id });
+      await sim.preparar({
+        movimientoPct: S.movimientoRequerido({
+          netoPct: cfg.netoPct, apalancamiento: cfg.apalancamiento, feeMaker: ctx.feeMaker
+        })
+      });
+      sim.on('log', (m) => nota(m));
+      sim.on('problema', (m) => {
+        notaError(`PROBLEMA: ${m}`);
+        notaError('Revisa la app de Bitget o ejecuta utils/emergencia.js si quedó algo abierto');
+        detener(`problema con el exchange: ${m}`);
+      });
+    }
+    sim.on('fill', (f) => {
+      try { onFill(f); }
+      catch (e) { notaError(`error en onFill: ${e.message}`); }
+    });
     await feed.esperarCuenta();
     estado.dia = dia();
     estado.fase = 'esperando';
-    nota(`SIMULACIÓN iniciada (maker ${ctx.feeMaker}, taker ${ctx.feeTaker})`);
+    nota(`${cfg.dryRun ? 'SIMULACIÓN' : 'MODO REAL'} iniciado (maker ${ctx.feeMaker}, taker ${ctx.feeTaker})`);
     timer = setInterval(latido, cfg.intervaloMs);
   }
 
-  function detener(motivo = 'manual') {
+  async function detener(motivo = 'manual', { cerrarPosiciones = cfg.dryRun } = {}) {
     if (estado.detenido) return;
     estado.detenido = true;
     estado.motivo = motivo;
     clearInterval(timer);
     if (sim) {
-      sim.cancelarEntrada('long');
-      sim.cancelarEntrada('short');
-      ['long', 'short'].forEach((l) => sim.cerrarAMercado(l));
+      try {
+        await Promise.all([sim.cancelarEntrada('long'), sim.cancelarEntrada('short')]);
+        if (cerrarPosiciones) {
+          await Promise.all(['long', 'short'].map((l) => sim.cerrarAMercado(l)));
+        } else if (sim.hayPosiciones()) {
+          nota('Posiciones abiertas: quedan en Bitget con su take profit y stop loss');
+        }
+      } catch (e) {
+        notaError(`error al cerrar: ${e.message}`);
+      }
     }
+    try { store.cerrarBot(id, motivo); } catch (e) { /* la base de datos es opcional */ }
     estado.fase = 'detenido';
     nota(`DETENIDO: ${motivo}`);
   }
@@ -269,6 +326,12 @@ function crearBot(userConfig) {
       porSalida,
       pnlDiaUSDT: Number(estado.pnlDia.toFixed(4))
     };
+  }
+
+  function lineaResumen() {
+    const r = resumen();
+    return `RESUMEN: ${r.operaciones} ops, ${r.ganadas} ganadas (${r.tasaAciertoPct ?? '-'}%), ` +
+           `neto ${r.netoTotalUSDT} USDT, salidas ${JSON.stringify(r.porSalida)}`;
   }
 
   return {

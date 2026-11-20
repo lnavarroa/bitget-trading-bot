@@ -80,7 +80,13 @@ class WsClient extends EventEmitter {
       }
     });
 
+    this.socket.on('error', (err) => {
+      // 'close' se dispara después y programa la reconexión
+      console.error('❌ WS error de conexión:', err.message);
+    });
+
     this.socket.on('close', () => {
+      this.isConnecting = false;
       this.hasLoggedIn = false;
       this.stopPing();
       this.reconnectTimeout = setTimeout(() => this.connect(auth), 5000);

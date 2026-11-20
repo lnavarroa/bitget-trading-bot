@@ -1,6 +1,6 @@
 const { crearBot } = require('../futures/futuresBot');
 
-const [, , SYMBOL = 'BTCUSDT', NETO = '1', SL = '0.36', MARGEN = '0', VENTANA = ''] = process.argv;
+const [, , SYMBOL = 'BTCUSDT', NETO = '10', SL = '5', MARGEN = '0', VENTANA = ''] = process.argv;
 const [desde, hasta] = VENTANA.split('-');
 
 const bot = crearBot({
@@ -26,8 +26,8 @@ setInterval(() => {
   if (minutos % 10 === 0) console.log('RESUMEN', JSON.stringify(bot.resumen()));
 }, 60000);
 
-function salir(senal) {
-  bot.detener(senal);
+async function salir(senal) {
+  await bot.detener(senal);
   bot.guardarResumen();
   console.log('\nRESUMEN FINAL', JSON.stringify(bot.resumen(), null, 2));
   process.exit(0);
